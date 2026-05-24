@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Cipher — Image Encrypt/Decrypt</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Image Encrypt / Decrypt</h1>
+    <p class="subtitle">Upload an image, choose an algorithm, enter a key, and encrypt or decrypt.</p>
+  </header>
+
+  <main>
+    <section class="controls">
+      <label class="file">
+        <span>Choose image</span>
+        <input id="imageInput" type="file" accept="image/*">
+      </label>
+
+      <label class="select">
+        <span>Algorithm</span>
+        <select id="algorithm">
+          <option value="caesar">Caesar Cipher (client demo)</option>
+          <option value="multiplicative">Multiplicative Cipher</option>
+          <option value="affine">Affine Cipher</option>
+          <option value="playfair">Playfair Cipher</option>
+          <option value="hill">Hill Cipher</option>
+          <option value="railfence">Rail Fence Cipher</option>
+          <option value="dh">Diffie-Hellman (key exchange)</option>
+          <option value="rsa">RSA</option>
+          <option value="rc4">RC4</option>
+        </select>
+      </label>
+      <div id="algNote" class="alg-note" aria-live="polite"></div>
+
+      <label class="key">
+        <span>Key / Parameters</span>
+        <input id="keyInput" type="text" placeholder="e.g. 13 or my-secret-key">
+        <input id="paramInput" type="text" placeholder="Algorithm parameter (if required)" style="margin-top:8px;">
+      </label>
+
+      <div class="buttons">
+        <button id="generateKey">Generate Key</button>
+        <button id="encryptBtn" class="primary">Encrypt</button>
+        <button id="decryptBtn">Decrypt</button>
+      </div>
+
+      <div class="options">
+        <label><input id="perChannel" type="checkbox" checked> Per-channel processing (R,G,B)</label>
+        <label><input id="preserveHeader" type="checkbox" checked> Preserve file headers</label>
+      </div>
+
+      <div id="messages" aria-live="polite"></div>
+    </section>
+
+    <section class="preview">
+      <canvas id="canvas" aria-label="Image preview"></canvas>
+      <div class="preview-actions">
+        <button id="downloadBtn" disabled>Download Result</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <small>Frontend demo supports Caesar locally. Other algorithms call backend endpoints: <code>/api/encrypt</code> and <code>/api/decrypt</code>. RC4 and Rail Fence are not implemented yet.</small>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
