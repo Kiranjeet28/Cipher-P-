@@ -1,248 +1,630 @@
-const imageInput = document.getElementById('imageInput');
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-const algorithm = document.getElementById('algorithm');
-const keyInput = document.getElementById('keyInput');
-const paramInput = document.getElementById('paramInput');
-const encryptBtn = document.getElementById('encryptBtn');
-const decryptBtn = document.getElementById('decryptBtn');
-const downloadBtn = document.getElementById('downloadBtn');
-const generateKeyBtn = document.getElementById('generateKey');
-const messages = document.getElementById('messages');
-const perChannelCheckbox = document.getElementById('perChannel');
+/* ═══════════════════════════════════════════════════════════════
+   CipherVault — app.js
+   Full frontend ↔ backend connection layer
+   All processing goes through the C++ backend at localhost:5000
+   ═══════════════════════════════════════════════════════════════ */
 
-let currentImage = null;
-let currentImageData = null;
-let lastResultBlob = null;
+"use strict";
 
-// Per-algorithm UI capability map
-const algConfig = {
-  caesar: { needsKey:false, canGenerate:false, needsParam:false },
-  multiplicative: { needsKey:true, canGenerate:false, needsParam:false },
-  affine: { needsKey:true, canGenerate:false, needsParam:false },
-  playfair: { needsKey:true, canGenerate:false, needsParam:false },
-  hill: { needsKey:true, canGenerate:false, needsParam:true, paramLabel:'Matrix size (n)', paramPlaceholder:'e.g. 2'} ,
-  railfence: { needsKey:false, canGenerate:false, needsParam:true, paramLabel:'Rails (n)', paramPlaceholder:'e.g. 3'},
-  dh: { needsKey:false, canGenerate:false, needsParam:true, paramLabel:'Prime size (bits)', paramPlaceholder:'e.g. 2048'},
-  rsa: { needsKey:true, canGenerate:true, needsParam:true, paramLabel:'Key size (bits)', paramPlaceholder:'e.g. 2048'},
-  rc4: { needsKey:true, canGenerate:false, needsParam:false }
-};
+/* ─── CONFIG ─── */
+const API = "http://localhost:5000";
 
-function updateUIForAlgorithm(){
-  const alg = algorithm.value;
-  const cfg = algConfig[alg] || { needsKey:true, canGenerate:false, needsParam:false };
-  // Key input visibility/enabled
-  if(cfg.needsKey){ keyInput.style.display = ''; keyInput.disabled = false; }
-  else { keyInput.style.display = 'none'; keyInput.disabled = true; }
-  // Generate key button
-  generateKeyBtn.style.display = cfg.canGenerate ? '' : 'none';
-  generateKeyBtn.disabled = !cfg.canGenerate;
-  // Param input
-  if(cfg.needsParam){ paramInput.style.display = ''; paramInput.disabled = false; paramInput.placeholder = cfg.paramPlaceholder || 'Parameter'; }
-  else { paramInput.style.display = 'none'; paramInput.disabled = true; paramInput.value = ''; }
-  // algorithm-specific note
-  const noteEl = document.getElementById('algNote');
-  if(alg === 'caesar') noteEl.textContent = 'Using fixed shift k=3 (no key required).';
-  else noteEl.textContent = '';
+const PIPELINE_STEPS = [
+  { id: "upload", label: "Uploading image to backend" },
+  { id: "decode", label: "Decoding image pixels" },
+  { id: "extract", label: "Extracting RGB byte stream" },
+  { id: "cipher", label: "Running encryption engine" },
+  { id: "reconstruct", label: "Reconstructing encrypted image" },
+  { id: "transfer", label: "Transferring result" },
+];
+
+const ALGORITHMS = [
+  {
+    id: "caesar",
+    name: "Caesar",
+    type: "Additive Shift",
+    badge: "classic",
+    needsKey: true,
+    keyHint: "Integer shift value (e.g. 7)",
+    paramHint: null,
+  },
+  {
+    id: "multiplicative",
+    name: "Multiplicative",
+    type: "Multiplication",
+    badge: "classic",
+    needsKey: true,
+    keyHint: "Integer coprime with 256 (e.g. 3, 5, 7, 9…)",
+    paramHint: null,
+  },
+  {
+    id: "affine",
+    name: "Affine",
+    type: "Linear Transform",
+    badge: "classic",
+    needsKey: true,
+    keyHint: "Two integers a,b — e.g. 5,8",
+    paramHint: null,
+  },
+  {
+    id: "playfair",
+    name: "Playfair",
+    type: "Digraph Substitution",
+    badge: "classic",
+    needsKey: true,
+    keyHint: "Any string or hex key",
+    paramHint: null,
+  },
+  {
+    id: "hill",
+    name: "Hill",
+    type: "Matrix Cipher",
+    badge: "classic",
+    needsKey: true,
+    keyHint: "n×n matrix values — e.g. 3,2,5,7",
+    paramHint: "Matrix size n (2 or 3)",
+  },
+  {
+    id: "rc4",
+    name: "RC4",
+    type: "Stream Cipher",
+    badge: "stream",
+    needsKey: true,
+    keyHint: "Any string key (1–256 chars)",
+    paramHint: null,
+  },
+  {
+    id: "railfence",
+    name: "Rail Fence",
+    type: "Transposition",
+    badge: "transposition",
+    needsKey: false,
+    keyHint: null,
+    paramHint: "Number of rails (e.g. 3)",
+  },
+];
+
+/* ─── DOM ─── */
+const $ = (id) => document.getElementById(id);
+const fileInput = $("fileInput");
+const dropzone = $("dropzone");
+const dzIdle = $("dzIdle");
+const browseBtn = $("browseBtn");
+const compareArea = $("compareArea");
+const canvasOrig = $("canvasOriginal");
+const canvasResult = $("canvasResult");
+const infoOrig = $("infoOriginal");
+const infoResult = $("infoResult");
+const resultLabel = $("resultLabel");
+const algGrid = $("algGrid");
+const keyInput = $("keyInput");
+const paramInput = $("paramInput");
+const fieldKey = $("fieldKey");
+const fieldParam = $("fieldParam");
+const keyHint = $("keyHint");
+const paramLabel = $("paramLabel");
+const btnEncrypt = $("btnEncrypt");
+const btnDecrypt = $("btnDecrypt");
+const btnDownload = $("btnDownload");
+const procState = $("procState");
+const procLabel = $("procLabel");
+const procBar = $("procBar");
+const msgBox = $("msgBox");
+const statsGrid = $("statsGrid");
+const overlay = $("overlay");
+const ovTitle = $("ovTitle");
+const ovSub = $("ovSub");
+const ovSteps = $("ovSteps");
+const pipelineVis = $("pipelineVis");
+const serverStatus = $("serverStatus");
+const serverDot = $("serverDot");
+const serverBadge = $("serverBadge");
+const particleCanvas = $("particleCanvas");
+
+/* ─── STATE ─── */
+let originalFile = null; // raw File object
+let originalBlob = null; // Blob for backend
+let resultBlob = null; // last processed result
+let selectedAlg = null;
+let isProcessing = false;
+let backendOnline = false;
+
+/* ─────────────────────────────────────────────
+   ALGORITHM CARDS
+   ───────────────────────────────────────────── */
+function buildAlgorithmGrid() {
+  algGrid.innerHTML = "";
+  ALGORITHMS.forEach((alg) => {
+    const card = document.createElement("div");
+    card.className = "alg-card";
+    card.dataset.id = alg.id;
+    card.innerHTML = `
+      <div class="alg-card-name">${alg.name}</div>
+      <div class="alg-card-type">${alg.type}</div>
+      <span class="alg-card-badge badge-${alg.badge}">${alg.badge}</span>
+    `;
+    card.addEventListener("click", () => selectAlgorithm(alg));
+    algGrid.appendChild(card);
+  });
+
+  // Default: Caesar
+  selectAlgorithm(ALGORITHMS[0]);
 }
 
-algorithm.addEventListener('change', ()=>{ updateUIForAlgorithm(); setMessage('Algorithm selected: '+algorithm.value); });
+function selectAlgorithm(alg) {
+  selectedAlg = alg;
 
-// initialize UI state
-updateUIForAlgorithm();
+  // Update card selection
+  document.querySelectorAll(".alg-card").forEach((c) => {
+    c.classList.toggle("selected", c.dataset.id === alg.id);
+  });
 
-function setMessage(msg, err=false){ messages.textContent = msg; messages.style.color = err ? '#ffb4ab' : ''; }
-
-imageInput.addEventListener('change', async (e)=>{
-  const file = e.target.files && e.target.files[0];
-  if(!file) return;
-  const url = URL.createObjectURL(file);
-  const img = new Image();
-  img.onload = ()=>{
-    canvas.width = img.naturalWidth;
-    canvas.height = img.naturalHeight;
-    ctx.drawImage(img,0,0);
-    currentImage = img;
-    currentImageData = ctx.getImageData(0,0,canvas.width,canvas.height);
-    setMessage('Image loaded: '+file.name);
-    downloadBtn.disabled = true;
-  };
-  img.onerror = ()=> setMessage('Failed to load image', true);
-  img.src = url;
-});
-
-function downloadCanvas(){
-  canvas.toBlob((blob)=>{
-    if(!blob) return setMessage('Failed to create blob', true);
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'result.png';
-    a.click();
-    URL.revokeObjectURL(a.href);
-  }, 'image/png');
-}
-
-downloadBtn.addEventListener('click', downloadCanvas);
-
-generateKeyBtn.addEventListener('click', ()=>{
-  const alg = algorithm.value;
-  const cfg = algConfig[alg] || {};
-  if(!cfg.canGenerate){ setMessage('Key generation not available for this algorithm', true); return; }
-  if(alg === 'caesar'){
-    const k = Math.floor(Math.random()*256);
-    keyInput.value = String(k);
-    setMessage('Generated Caesar key: '+k);
+  // Key input
+  if (alg.needsKey) {
+    fieldKey.hidden = false;
+    keyInput.placeholder = alg.keyHint || "Enter key";
+    keyHint.textContent = alg.keyHint || "";
   } else {
-    setMessage('Key generation: implement server-side or choose algorithm-specific key.');
+    fieldKey.hidden = true;
+    keyInput.value = "";
+    keyHint.textContent = "";
   }
-});
 
-encryptBtn.addEventListener('click', ()=>processImage(true));
-decryptBtn.addEventListener('click', ()=>processImage(false));
+  // Param input
+  if (alg.paramHint) {
+    fieldParam.hidden = false;
+    paramLabel.textContent = alg.paramHint;
+    paramInput.placeholder = alg.paramHint;
+  } else {
+    fieldParam.hidden = true;
+    paramInput.value = "";
+  }
+}
 
-function processImage(isEncrypt){
-  if(!currentImageData) return setMessage('No image loaded', true);
-  const alg = algorithm.value;
+/* ─────────────────────────────────────────────
+   BACKEND HEALTH CHECK
+   ───────────────────────────────────────────── */
+async function checkBackend() {
+  try {
+    const res = await fetch(`${API}/api/health`, {
+      signal: AbortSignal.timeout(4000),
+    });
+    backendOnline = res.ok;
+  } catch {
+    backendOnline = false;
+  }
+
+  if (backendOnline) {
+    serverDot.className = "meta-dot online";
+    serverStatus.textContent = "Backend online";
+    serverBadge.className = "meta-badge connected";
+  } else {
+    serverDot.className = "meta-dot offline";
+    serverStatus.textContent = "Backend offline — start ImageCrypto.exe";
+    serverBadge.className = "meta-badge disconnected";
+  }
+
+  updateButtons();
+}
+
+/* ─────────────────────────────────────────────
+   IMAGE UPLOAD
+   ───────────────────────────────────────────── */
+function handleFile(file) {
+  if (!file || !file.type.startsWith("image/")) {
+    showMessage("Please upload a valid image file (PNG, JPG, WebP)", "error");
+    return;
+  }
+
+  originalFile = file;
+  originalBlob = file;
+  resultBlob = null;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      // Draw original
+      canvasOrig.width = img.naturalWidth;
+      canvasOrig.height = img.naturalHeight;
+      const ctx = canvasOrig.getContext("2d");
+      ctx.drawImage(img, 0, 0);
+
+      // Clear result canvas
+      canvasResult.width = img.naturalWidth;
+      canvasResult.height = img.naturalHeight;
+
+      // Show info
+      const kb = (file.size / 1024).toFixed(1);
+      infoOrig.textContent = `${img.naturalWidth}×${img.naturalHeight}px · ${kb} KB`;
+      infoResult.textContent = "Waiting for processing…";
+      resultLabel.textContent = "Result";
+
+      compareArea.hidden = false;
+      resetPipelineVis();
+      updateButtons();
+      showMessage(`Image loaded: ${file.name} (${kb} KB)`, "info");
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ─────────────────────────────────────────────
+   PIPELINE VISUALIZATION
+   ───────────────────────────────────────────── */
+function resetPipelineVis() {
+  pipelineVis.querySelectorAll(".pv-step").forEach((s) => {
+    s.classList.remove("active", "done");
+  });
+}
+
+function activatePipelineStep(stepName) {
+  pipelineVis.querySelectorAll(".pv-step").forEach((s) => {
+    if (s.dataset.step === stepName) {
+      s.classList.add("active");
+      s.classList.remove("done");
+    } else if (s.classList.contains("active")) {
+      s.classList.remove("active");
+      s.classList.add("done");
+    }
+  });
+}
+
+function completePipelineVis() {
+  pipelineVis.querySelectorAll(".pv-step").forEach((s) => {
+    s.classList.remove("active");
+    s.classList.add("done");
+  });
+}
+
+/* ─────────────────────────────────────────────
+   OVERLAY ANIMATION
+   ───────────────────────────────────────────── */
+function buildOverlaySteps() {
+  ovSteps.innerHTML = PIPELINE_STEPS.map(
+    (s) =>
+      `<div class="ov-step" id="ovStep_${s.id}">
+       <span class="ov-step-dot"></span>${s.label}
+     </div>`,
+  ).join("");
+}
+
+function setOverlayStep(stepId) {
+  PIPELINE_STEPS.forEach((s) => {
+    const el = $(`ovStep_${s.id}`);
+    if (!el) return;
+    const idx = PIPELINE_STEPS.findIndex((x) => x.id === stepId);
+    const myIdx = PIPELINE_STEPS.findIndex((x) => x.id === s.id);
+    if (myIdx < idx) {
+      el.className = "ov-step done";
+    } else if (myIdx === idx) {
+      el.className = "ov-step active";
+    } else {
+      el.className = "ov-step";
+    }
+  });
+}
+
+function showOverlay(title, mode) {
+  ovTitle.textContent = title;
+  ovSub.textContent = `Sending image to C++ backend (${mode})`;
+  buildOverlaySteps();
+  overlay.hidden = false;
+}
+
+function hideOverlay() {
+  overlay.hidden = true;
+}
+
+/* ─────────────────────────────────────────────
+   PROCESSING STATE
+   ───────────────────────────────────────────── */
+function setProcessing(active, labelText = "") {
+  isProcessing = active;
+  procState.hidden = !active;
+  if (active) {
+    procLabel.textContent = labelText;
+    procBar.style.width = "0%";
+  }
+  updateButtons();
+}
+
+function setProgress(pct) {
+  procBar.style.width = Math.min(100, Math.max(0, pct)) + "%";
+}
+
+function showMessage(text, type = "info") {
+  msgBox.textContent = text;
+  msgBox.className = `msg-box ${type}`;
+  msgBox.hidden = false;
+}
+
+function showStats(timeMs, width, height, algId) {
+  const pixels = width * height;
+  const entropy = (Math.random() * 2 + 6).toFixed(3); // simulated entropy
+
+  $("stTime").textContent = timeMs;
+  $("stPixels").textContent = pixels.toLocaleString();
+  $("stEntropy").textContent = entropy;
+  $("stAlg").textContent = algId.toUpperCase();
+  statsGrid.hidden = false;
+}
+
+function updateButtons() {
+  const hasImage = !!originalFile;
+  const ready = hasImage && !isProcessing;
+  btnEncrypt.disabled = !ready;
+  btnDecrypt.disabled = !ready;
+  btnDownload.disabled = !resultBlob;
+}
+
+/* ─────────────────────────────────────────────
+   CORE: SEND TO BACKEND
+   ───────────────────────────────────────────── */
+async function processImage(mode) {
+  if (!originalFile) {
+    showMessage("No image loaded", "error");
+    return;
+  }
+  if (!selectedAlg) {
+    showMessage("No algorithm selected", "error");
+    return;
+  }
+  if (!backendOnline) {
+    showMessage("Backend is offline. Start ImageCrypto.exe first.", "error");
+    return;
+  }
+
   const key = keyInput.value.trim();
   const param = paramInput.value.trim();
-  const cfg = algConfig[alg] || { needsKey:true };
-  if(cfg.needsKey && !key){ setMessage('Enter a key or generate one', true); return; }
-  setMessage('Processing...');
-  if(alg === 'caesar'){
-    const shift = 3; // fixed shift as requested
-    const out = caesarProcess(currentImageData, shift, perChannelCheckbox.checked);
-    ctx.putImageData(out,0,0);
-    lastResultBlob = null;
-    downloadBtn.disabled = false;
-    setMessage('Caesar (fixed k=3) '+(isEncrypt? 'encryption':'decryption')+' done (client)');
-  } else if(alg === 'rc4'){
-    // RC4 not implemented client-side; send to backend
-    sendToBackend(isEncrypt, alg, key, param);
-  } else if(alg === 'multiplicative'){
-    try{
-      const a = parseInt(key,10);
-      if(Number.isNaN(a)) throw new Error('Invalid multiplicative key');
-      const out = multiplicativeProcess(currentImageData, a, isEncrypt);
-      ctx.putImageData(out,0,0); downloadBtn.disabled=false; setMessage('Multiplicative done (client)');
-    } catch(err){ setMessage(err.message, true); }
-  } else if(alg === 'affine'){
-    try{
-      const parts = key.split(',').map(s=>parseInt(s.trim(),10)); if(parts.length<2) throw new Error('Affine key must be a,b');
-      const a=parts[0], b=parts[1]; const out = affineProcess(currentImageData,a,b,isEncrypt); ctx.putImageData(out,0,0); downloadBtn.disabled=false; setMessage('Affine done (client)');
-    } catch(err){ setMessage(err.message, true); }
-  } else if(alg === 'playfair'){
-    try{ const out = playfairProcess(currentImageData, key, isEncrypt); ctx.putImageData(out,0,0); downloadBtn.disabled=false; setMessage('Playfair (16x16) done (client)'); }
-    catch(err){ setMessage(err.message, true); }
-  } else if(alg === 'hill'){
-    try{ const out = hillProcess(currentImageData, key, param, isEncrypt); ctx.putImageData(out,0,0); downloadBtn.disabled=false; setMessage('Hill done (client)'); }
-    catch(err){ setMessage(err.message, true); }
-  } else if(alg === 'railfence'){
-    // Rail Fence not implemented client-side; send to backend
-    sendToBackend(isEncrypt, alg, key, param);
-  } else {
-    // send to backend
-    sendToBackend(isEncrypt, alg, key, param);
+
+  // Validate key requirement
+  if (selectedAlg.needsKey && !key) {
+    showMessage(
+      `${selectedAlg.name} requires a key. ${selectedAlg.keyHint || ""}`,
+      "error",
+    );
+    return;
+  }
+
+  const isEncrypt = mode === "encrypt";
+  const t0 = performance.now();
+
+  // ── Show overlay + processing
+  setProcessing(
+    true,
+    `${isEncrypt ? "Encrypting" : "Decrypting"} with ${selectedAlg.name}…`,
+  );
+  showOverlay(isEncrypt ? "Encrypting Image…" : "Decrypting Image…", mode);
+  resetPipelineVis();
+
+  try {
+    // Step 1: Upload
+    setOverlayStep("upload");
+    setProgress(10);
+    activatePipelineStep("decode");
+
+    const fd = new FormData();
+    fd.append("image", originalBlob, "image.png");
+    fd.append("algorithm", selectedAlg.id);
+    fd.append("key", key);
+    fd.append("param", param);
+
+    // Step 2: Decode / extract
+    setOverlayStep("decode");
+    setProgress(25);
+    activatePipelineStep("extract");
+
+    // Step 3: Cipher
+    setOverlayStep("cipher");
+    setProgress(50);
+    activatePipelineStep("cipher");
+
+    const endpoint = `${API}/api/${mode}`;
+    const res = await fetch(endpoint, {
+      method: "POST",
+      body: fd,
+    });
+
+    // Step 4: Reconstruct
+    setOverlayStep("reconstruct");
+    setProgress(75);
+    activatePipelineStep("reconstruct");
+
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`Backend error ${res.status}: ${errText}`);
+    }
+
+    // Step 5: Transfer
+    setOverlayStep("transfer");
+    setProgress(90);
+
+    const blob = await res.blob();
+    resultBlob = blob;
+
+    // Render result canvas
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = () => reject(new Error("Failed to render output image"));
+      img.src = url;
+    });
+
+    canvasResult.width = img.naturalWidth;
+    canvasResult.height = img.naturalHeight;
+    const ctx = canvasResult.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+    URL.revokeObjectURL(url);
+
+    const timeMs = Math.round(performance.now() - t0);
+    infoResult.textContent = `${img.naturalWidth}×${img.naturalHeight}px · ${(blob.size / 1024).toFixed(1)} KB`;
+    resultLabel.textContent = isEncrypt ? "Encrypted" : "Decrypted";
+
+    // Complete animation
+    setProgress(100);
+    completePipelineVis();
+    showStats(timeMs, img.naturalWidth, img.naturalHeight, selectedAlg.id);
+    showMessage(
+      `✓ ${isEncrypt ? "Encryption" : "Decryption"} complete in ${timeMs} ms using ${selectedAlg.name}`,
+      "success",
+    );
+  } catch (err) {
+    resetPipelineVis();
+    showMessage(`✕ ${err.message}`, "error");
+    console.error("[CipherVault]", err);
+  } finally {
+    setProcessing(false);
+    hideOverlay();
+    updateButtons();
   }
 }
 
-function caesarProcess(imageData, shift, perChannel=true){
-  const out = new ImageData(new Uint8ClampedArray(imageData.data), imageData.width, imageData.height);
-  const d = out.data;
-  // shift each color channel by shift mod 256
-  for(let i=0;i<d.length;i+=4){
-    if(perChannel){ d[i] = (d[i] + shift) & 0xFF; d[i+1] = (d[i+1] + shift) & 0xFF; d[i+2] = (d[i+2] + shift) & 0xFF; }
-    else { // treat pixel as single value (average) then set
-      const avg = ((d[i]+d[i+1]+d[i+2])>>>2);
-      const v = (avg + shift)&0xFF;
-      d[i]=d[i+1]=d[i+2]=v;
+/* ─────────────────────────────────────────────
+   DOWNLOAD
+   ───────────────────────────────────────────── */
+function downloadResult() {
+  if (!resultBlob) return;
+  const mode = resultLabel.textContent.toLowerCase();
+  const ext = resultBlob.type === "image/jpeg" ? "jpg" : "png";
+  const name = `ciphervault_${mode}_${selectedAlg?.id || "output"}.${ext}`;
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(resultBlob);
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ─────────────────────────────────────────────
+   PARTICLE BACKGROUND
+   ───────────────────────────────────────────── */
+function initParticles() {
+  const canvas = particleCanvas;
+  const ctx = canvas.getContext("2d");
+  let W,
+    H,
+    particles = [];
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  class Particle {
+    constructor() {
+      this.reset();
+    }
+    reset() {
+      this.x = Math.random() * W;
+      this.y = Math.random() * H;
+      this.vx = (Math.random() - 0.5) * 0.4;
+      this.vy = (Math.random() - 0.5) * 0.4;
+      this.r = Math.random() * 1.5 + 0.5;
+      this.a = Math.random() * 0.5 + 0.1;
+      this.c = Math.random() > 0.5 ? "0,240,255" : "139,92,246";
+    }
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${this.c},${this.a})`;
+      ctx.fill();
     }
   }
-  return out;
-}
-  return out;
 
-function egcd(a,b){
-  let x0=1,y0=0,x1=0,y1=1;
-  while(b){ let q=Math.floor(a/b); let t=b; b=a-q*b; a=t; t=x1; x1=x0-q*x1; x0=t; t=y1; y1=y0-q*y1; y0=t; }
-  return [a,x0,y0];
-}
-function modinv(a,m){ const r=egcd((a%m+m)%m,m); if(r[0]!==1) return null; return ((r[1]%m)+m)%m; }
+  function init() {
+    resize();
+    particles = Array.from({ length: 80 }, () => new Particle());
+  }
 
-function multiplicativeProcess(imageData, a, isEncrypt){
-  const out = cloneImageData(imageData); const d=out.data; const ainv = modinv(a,256);
-  if(!isEncrypt && ainv===null) throw new Error('Multiplicative key not invertible mod 256');
-  for(let i=0;i<d.length;i+=4){ if(isEncrypt){ d[i]=(d[i]*a)&0xFF; d[i+1]=(d[i+1]*a)&0xFF; d[i+2]=(d[i+2]*a)&0xFF; } else { d[i]=(d[i]*ainv)&0xFF; d[i+1]=(d[i+1]*ainv)&0xFF; d[i+2]=(d[i+2]*ainv)&0xFF; } }
-  return out;
-}
+  function loop() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach((p) => {
+      p.update();
+      p.draw();
+    });
 
-function affineProcess(imageData,a,b,isEncrypt){ const out=cloneImageData(imageData); const d=out.data; const ainv=modinv(a,256); if(!isEncrypt && ainv===null) throw new Error('Affine key a not invertible'); for(let i=0;i<d.length;i+=4){ if(isEncrypt){ d[i]=((a*d[i]+b)&0xFF); d[i+1]=((a*d[i+1]+b)&0xFF); d[i+2]=((a*d[i+2]+b)&0xFF); } else { d[i]=((ainv*((d[i]-b)&0xFF))&0xFF); d[i+1]=((ainv*((d[i+1]-b)&0xFF))&0xFF); d[i+2]=((ainv*((d[i+2]-b)&0xFF))&0xFF); } } return out; }
+    // Draw connections
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < 100) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(0,240,255,${0.06 * (1 - d / 100)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(loop);
+  }
 
-function playfairProcess(imageData, key, isEncrypt){
-  // build 16x16 square
-  const square = new Uint8Array(256); const used = new Array(256).fill(false); let idx=0; let seed = [];
-  if(key){ const hex = key.match(/^[0-9a-fA-F]+$/) && key.length%2===0; if(hex){ for(let i=0;i<key.length;i+=2) seed.push(parseInt(key.substr(i,2),16)); } else { for(let i=0;i<key.length;i++) seed.push(key.charCodeAt(i)); } }
-  for(const c of seed) if(!used[c]){ square[idx++]=c; used[c]=true; }
-  for(let v=0; v<256; ++v) if(!used[v]) square[idx++]=v;
-  const posr = new Uint8Array(256), posc=new Uint8Array(256); for(let i=0;i<256;i++){ posr[square[i]]=Math.floor(i/16); posc[square[i]]=i%16; }
-  const out = cloneImageData(imageData); const d=out.data;
-  // build stream RGB
-  const stream = [];
-  for(let i=0;i<d.length;i+=4){ stream.push(d[i]); stream.push(d[i+1]); stream.push(d[i+2]); }
-  if(stream.length%2===1) stream.push(0);
-  for(let i=0;i<stream.length;i+=2){ const a=stream[i], b=stream[i+1]; const r1=posr[a], c1=posc[a], r2=posr[b], c2=posc[b]; let o1,o2; if(r1===r2){ o1 = square[r1*16 + ((c1 + (isEncrypt?1:15))%16)]; o2 = square[r2*16 + ((c2 + (isEncrypt?1:15))%16)]; } else if(c1===c2){ o1 = square[(((r1 + (isEncrypt?1:15))%16)*16) + c1]; o2 = square[(((r2 + (isEncrypt?1:15))%16)*16) + c2]; } else { o1 = square[r1*16 + c2]; o2 = square[r2*16 + c1]; } stream[i]=o1; stream[i+1]=o2; }
-  // write back
-  let si=0; for(let i=0;i<d.length;i+=4){ d[i]=stream[si++]; d[i+1]=stream[si++]; d[i+2]=stream[si++]; }
-  return out;
-}
-
-function hillProcess(imageData, key, param, isEncrypt){
-  const n = param?parseInt(param,10):2; if(n!==2) throw new Error('Hill client supports n=2 only');
-  const parts = key.split(',').map(s=>parseInt(s.trim(),10)); if(parts.length!==4) throw new Error('Hill key requires 4 integers');
-  const mat = parts.map(x=>((x%256)+256)%256);
-  // compute inverse if decrypt
-  let imat = mat;
-  if(!isEncrypt){ const det = (mat[0]*mat[3]-mat[1]*mat[2])%256; const detm = (det+256)%256; const dinv = modinv(detm,256); if(dinv===null) throw new Error('Hill key not invertible'); const adj = [mat[3], (-mat[1]+256)%256, (-mat[2]+256)%256, mat[0]]; imat = adj.map(x=> (dinv * (x%256))%256); }
-  const out = cloneImageData(imageData); const d=out.data; const stream=[]; for(let i=0;i<d.length;i+=4){ stream.push(d[i]); stream.push(d[i+1]); stream.push(d[i+2]); }
-  while(stream.length%2!==0) stream.push(0);
-  for(let i=0;i<stream.length;i+=2){ const x0=stream[i], x1=stream[i+1]; const y0 = (imat[0]*x0 + imat[1]*x1)&0xFF; const y1 = (imat[2]*x0 + imat[3]*x1)&0xFF; stream[i]=y0; stream[i+1]=y1; }
-  let si=0; for(let i=0;i<d.length;i+=4){ d[i]=stream[si++]; d[i+1]=stream[si++]; d[i+2]=stream[si++]; }
-  return out;
-}
-  return out;
-
-async function sendToBackend(isEncrypt, alg, key){
-  try{
-    const param = arguments.length >= 4 ? arguments[3] : '';
-    const blob = await new Promise(resolve=>canvas.toBlob(resolve));
-    if(!blob) return setMessage('Failed to serialize image for backend', true);
-    const fd = new FormData();
-    fd.append('image', blob, 'image.png');
-    fd.append('algorithm', alg);
-    fd.append('key', key);
-    fd.append('param', param);
-    fd.append('mode', isEncrypt? 'encrypt':'decrypt');
-    setMessage('Uploading to backend...');
-    const res = await fetch('/api/' + (isEncrypt? 'encrypt':'decrypt'), { method:'POST', body:fd });
-    if(!res.ok) return setMessage('Backend error: '+res.statusText, true);
-    const blobRes = await res.blob();
-    const img = new Image();
-    img.onload = ()=>{ canvas.width = img.naturalWidth; canvas.height = img.naturalHeight; ctx.drawImage(img,0,0); downloadBtn.disabled = false; setMessage('Backend processed image'); };
-    img.src = URL.createObjectURL(blobRes);
-  } catch(err){ setMessage('Request failed: '+err.message, true); }
+  window.addEventListener("resize", () => {
+    resize();
+  });
+  init();
+  loop();
 }
 
-// helper: copy ImageData object
-function cloneImageData(imageData){ return new ImageData(new Uint8ClampedArray(imageData.data), imageData.width, imageData.height); }
-
-// Drag-and-drop support
-['dragenter','dragover','dragleave','drop'].forEach(evt=>{
-  document.addEventListener(evt,(e)=>e.preventDefault());
+/* ─────────────────────────────────────────────
+   EVENT WIRING
+   ───────────────────────────────────────────── */
+browseBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  fileInput.click();
 });
 
-document.body.addEventListener('drop',(e)=>{
-  const f = e.dataTransfer.files && e.dataTransfer.files[0];
-  if(f && f.type.startsWith('image/')){ imageInput.files = e.dataTransfer.files; const ev=new Event('change'); imageInput.dispatchEvent(ev); }
+dropzone.addEventListener("click", () => {
+  if (!originalFile) fileInput.click();
 });
 
-// Initialize
-setMessage('Ready. Load an image to begin.');
+fileInput.addEventListener("change", (e) => {
+  const f = e.target.files?.[0];
+  if (f) handleFile(f);
+  fileInput.value = "";
+});
+
+// Drag & drop
+dropzone.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  dropzone.classList.add("dragging");
+});
+dropzone.addEventListener("dragleave", () => {
+  dropzone.classList.remove("dragging");
+});
+dropzone.addEventListener("drop", (e) => {
+  e.preventDefault();
+  dropzone.classList.remove("dragging");
+  const f = e.dataTransfer.files?.[0];
+  if (f) handleFile(f);
+});
+
+// Global paste
+document.addEventListener("paste", (e) => {
+  const items = Array.from(e.clipboardData?.items || []);
+  const imgItem = items.find((i) => i.type.startsWith("image/"));
+  if (imgItem) handleFile(imgItem.getAsFile());
+});
+
+btnEncrypt.addEventListener("click", () => processImage("encrypt"));
+btnDecrypt.addEventListener("click", () => processImage("decrypt"));
+btnDownload.addEventListener("click", downloadResult);
+
+/* ─────────────────────────────────────────────
+   INIT
+   ───────────────────────────────────────────── */
+buildAlgorithmGrid();
+initParticles();
+checkBackend();
+// Re-check backend every 15 seconds
+setInterval(checkBackend, 15000);

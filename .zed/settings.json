@@ -1,0 +1,7 @@
+{
+  "remove_trailing_whitespace_on_save": false,
+  "indent_guides": {
+    "background_coloring": "indent_aware"
+  },
+  "show_wrap_guides": false
+}

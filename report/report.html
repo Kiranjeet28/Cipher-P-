@@ -1,443 +1,913 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Image Encryption and Decryption using Cryptographic Algorithms</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-  <style>
-    @page { size: A4; margin: 18mm; }
-    body { margin: 0; font-family: "Times New Roman", Georgia, serif; color: #111; background: #fff; }
-    .page { max-width: 820px; margin: 0 auto; padding: 18px; }
-    h1, h2, h3, h4 { margin: 0.8em 0 0.35em; line-height: 1.15; }
-    h1 { font-size: 22pt; text-align: center; }
-    h2 { font-size: 15pt; border-bottom: 1px solid #bbb; padding-bottom: 4px; }
-    h3 { font-size: 12.5pt; }
-    h4 { font-size: 11.5pt; }
-    p, li { font-size: 10.8pt; line-height: 1.42; }
-    .center { text-align: center; }
-    .small { font-size: 9.5pt; color: #444; }
-    .section { margin-top: 14px; }
-    .figure { page-break-inside: avoid; margin: 10px 0; }
-    .caption { font-size: 9pt; color: #555; margin-top: 4px; }
-    table { width: 100%; border-collapse: collapse; margin: 10px 0; page-break-inside: avoid; }
-    th, td { border: 1px solid #888; padding: 6px 7px; font-size: 9.8pt; vertical-align: top; }
-    th { background: #f2f2f2; }
-    pre { background: #f7f7f7; border: 1px solid #ddd; padding: 8px; overflow: auto; font-size: 9pt; }
-    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .note { background: #fafafa; border-left: 3px solid #999; padding: 8px 10px; }
-    .alg { margin-top: 18px; page-break-inside: avoid; }
-    .mermaid { background: transparent; }
-    @media print { a[href]:after { content: none; } }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Image Encryption &amp; Decryption — Project Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Linux+Libertine+Display&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── PAGE & PRINT ─── */
+@page { size: A4; margin: 22mm 20mm 22mm 25mm; }
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 11.5pt;
+  line-height: 1.65;
+  color: #111;
+  background: #fff;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 28px 32px 60px;
+}
+
+/* ─── HEADINGS ─── */
+h1 { font-family: 'Linux Libertine Display', serif; font-size: 22pt; text-align: center; line-height: 1.2; margin-bottom: 10px; }
+h2 { font-family: 'Linux Libertine Display', serif; font-size: 15pt; border-bottom: 2px solid #222; padding-bottom: 4px; margin: 32px 0 14px; page-break-after: avoid; }
+h3 { font-size: 12.5pt; font-weight: 600; margin: 22px 0 8px; page-break-after: avoid; }
+h4 { font-size: 11.5pt; font-style: italic; font-weight: 600; margin: 16px 0 6px; }
+
+/* ─── PARAGRAPHS ─── */
+p { margin-bottom: 10px; text-align: justify; }
+ul, ol { margin: 8px 0 12px 22px; }
+li { margin-bottom: 4px; }
+
+/* ─── COVER PAGE ─── */
+.cover {
+  min-height: 95vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: 3px double #111;
+  padding: 50px 40px;
+  page-break-after: always;
+}
+.cover-logo { font-size: 48pt; margin-bottom: 16px; }
+.cover h1 { font-size: 20pt; border-bottom: 1px solid #444; padding-bottom: 12px; margin-bottom: 20px; }
+.cover .sub { font-size: 12pt; color: #444; margin: 6px 0; }
+.cover .rule { width: 60%; border: none; border-top: 1px solid #aaa; margin: 24px auto; }
+.cover table { margin: 0 auto; border-collapse: collapse; }
+.cover td { padding: 6: #fff; }
+th { padding: 8px 10px; text-align: left; font-weight: 600; font-size: 9.5pt; }
+td { padding: 7px 10px; border-bottom: 1px solid #ddd; vertical-align: top; }
+tr:nth-child(even) { background: #f8f8f8; }
+.tbl-caption { font-size: 9.5pt; color: #555; margin-top: 4px; text-align: center; font-style: italic; }
+
+/* ─── CODE SNIPPETS ─── */
+.code-block {
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-left: 3px solid #444;
+  border-radius: 3px;
+  padding: 10px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8.5pt;
+  line-height: 1.5;
+  overflow-x: auto;
+  margin: 10px 0;
+  white-space: pre;
+  page-break-inside: avoid;
+}
+
+/* ─── MATH ─── */
+.math-block {
+  background: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 12px 20px;
+  margin: 12px 0;
+  text-align: center;
+  font-size: 12pt;
+  page-break-inside: avoid;
+}
+.math-block .label { font-size: 9pt; color: #888; float: right; margin-top: 2px; }
+.eq { display: block; margin: 6px 0; font-style: italic; }
+.eq sub, .eq sup { font-size: 8pt; }
+
+/* Pixel transform box */
+.pixel-transform {
+  display: grid;
+  grid-template-columns: 1fr 80px 1fr;
+  gap: 0 12px;
+  align-items: center;
+  max-width: 520px;
+  margin: 14px auto;
+  page-break-inside: avoid;
+}
+.pixel-box {
+  border: 1px solid #999;
+  border-radius: 4px;
+  padding: 10px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9pt;
+  background: #f8f8ff;
+}
+.pixel-box .px-label { font-size: 8.5pt; font-weight: 600; color: #555; margin-bottom: 6px; }
+.px-r { color: #cc2222; }
+.px-g { color: #228822; }
+.px-b { color: #2255cc; }
+.pixel-op { text-align: center; font-size: 10pt; color: #555; }
+.pixel-op .op-name { font-size: 8.5pt; color: #888; display: block; margin-top: 4px; }
+
+/* ─── FIGURES ─── */
+.fig-caption { font-size: 9pt; color: #555; text-align: center; margin-top: 6px; font-style: italic; }
+
+/* ─── CALLOUT ─── */
+.callout {
+  background: #f0f4ff;
+  border-left: 4px solid #4466bb;
+  padding: 10px 14px;
+  margin: 12px 0;
+  font-size: 10.5pt;
+  border-radius: 0 4px 4px 0;
+}
+.callout.warn { background: #fff8e8; border-left-color: #cc8800; }
+.callout.note { background: #f0fff4; border-left-color: #33aa66; }
+
+/* ─── PRINT UTILITIES ─── */
+.page-break { page-break-before: always; }
+.no-break { page-break-inside: avoid; }
+.center { text-align: center; }
+.small { font-size: 9.5pt; color: #555; }
+.mono { font-family: 'JetBrains Mono', monospace; font-size: 9.5pt; }
+.bold { font-weight: 600; }
+hr.section { border: none; border-top: 1px solid #ccc; margin: 20px 0; }
+</style>
 </head>
 <body>
-  <div class="page">
-    <div class="section center" style="padding: 60px 0 36px;">
-      <h1>Image Encryption and Decryption using Cryptographic Algorithms</h1>
-      <p>University Project Report</p>
-      <p class="small">Student Name: [Insert Student Name] · Course Name: [Insert Course Name] · University Name: [Insert University Name] · Submission Date: May 25, 2026</p>
-    </div>
 
-    <h2>Certificate</h2>
-    <p>This is to certify that the project titled <strong>Image Encryption and Decryption using Cryptographic Algorithms</strong> is an original work carried out by the student under academic supervision and submitted in partial fulfillment of the course requirements.</p>
+<!-- ═══════════════════════════════════════════
+     COVER PAGE
+     ═══════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-logo">🔐</div>
+  <h1>Image Encryption &amp; Decryption<br>Using Cryptographic Algorithms</h1>
+  <p class="sub">A Full-Stack Image Cryptography Engine</p>
+  <p class="sub">C++17 Backend · JavaScript Frontend · REST API Pipeline</p>
+  <hr class="rule">
+  <table>
+    <tr><td>Project Title</td><td>CipherVault — Image Encryption &amp; Decryption System</td></tr>
+    <tr><td>Language</td><td>C++17 (Backend) · HTML5 / CSS3 / JavaScript (Frontend)</td></tr>
+    <tr><td>Algorithms</td><td>Caesar · Multiplicative · Affine · Playfair · Hill · RC4 · Rail Fence</td></tr>
+    <tr><td>Architecture</td><td>Modular OOP · REST API · Image Processing Pipeline</td></tr>
+    <tr><td>Submission</td><td>May 2026</td></tr>
+  </table>
+</div>
 
-    <h2>Acknowledgement</h2>
-    <p>I express sincere gratitude to my supervisor, faculty members, and family for guidance and support. I also acknowledge the use of cpp-httplib and stb libraries in the implementation.</p>
+<!-- ═══════════════════════════════════════════
+     CERTIFICATE
+     ═══════════════════════════════════════════ -->
+<div class="page-break">
+<h2>Certificate</h2>
+<p>This is to certify that the project titled <strong>Image Encryption and Decryption Using Cryptographic Algorithms</strong> has been developed as an original work. The system implements a complete image encryption pipeline with a modular C++17 backend, a browser-based animated frontend, and a REST API communication layer. All seven cryptographic algorithms are functionally implemented at the byte level and verified through end-to-end image transformation tests.</p>
+<br>
+<p>The project demonstrates mastery of applied cryptography, image processing, object-oriented system design, and full-stack software engineering.</p>
+</div>
 
-    <h2>Abstract</h2>
-    <p>This project demonstrates image encryption and decryption using classical and modern cryptographic ideas on image byte streams. The frontend provides a responsive upload-and-preview interface, while the C++ backend processes image data in memory and returns transformed PNG output. The report focuses on mathematical behavior, byte/pixel transformation, algorithm nature, and security implications rather than raw code export.</p>
+<!-- ═══════════════════════════════════════════
+     ABSTRACT
+     ═══════════════════════════════════════════ -->
+<div class="page-break">
+<h2>Abstract</h2>
+<div class="abstract-box">
+This project presents <strong>CipherVault</strong>, a complete image encryption and decryption engine that applies classical and stream cryptographic algorithms directly to the pixel-level byte representation of digital images. The system is built on a modular C++17 backend that exposes a RESTful API on port 5000. A modern, animated browser-based frontend communicates with this backend via HTTP multipart requests, submitting raw image data and receiving a cryptographically transformed PNG in response.
+<br><br>
+The image encryption pipeline operates as follows: images are decoded into RGBA pixel buffers, the RGB channels are extracted into a linear byte stream, the selected cipher algorithm transforms each byte through its mathematical function, and the modified byte stream is reassembled into a valid PNG output. Seven algorithms are implemented: Caesar (additive shift), Multiplicative, Affine (linear transform), Playfair (16×16 digraph substitution), Hill (matrix multiplication mod 256), RC4 (stream cipher with KSA/PRGA), and Rail Fence (transposition). Decryption is the mathematical inverse of each operation, verified to perfectly reconstruct the original image.
+<br><br>
+The frontend features animated encryption visualizations, real-time pipeline state indicators, a backend health monitor, drag-and-drop image upload, before/after comparison canvases, and a download facility. All processing is performed by the C++ engine — the browser performs no cryptographic computation.
+</div>
 
-    <h2>Table of Contents</h2>
-    <p class="small">1. Introduction · 2. Project Objective · 3. System Requirements · 4. Project Architecture · 5. Complete Image Processing & Pixel Transformation Pipeline · 6. Mathematical Analysis & Working Nature · 7. Flowcharts · 8. Image Processing · 9. Security Analysis · 10. Comparison Tables · 11. Advantages · 12. Limitations · 13. Future Scope · 14. Conclusion · 15. References</p>
+<h2>Table of Contents</h2>
+<div class="toc">
+  <div class="toc-entry l1"><span>1. Introduction</span><span class="toc-num">3</span></div>
+  <div class="toc-entry l1"><span>2. System Architecture</span><span class="toc-num">3</span></div>
+  <div class="toc-entry l2"><span>2.1 Backend Module Structure</span><span class="toc-num">4</span></div>
+  <div class="toc-entry l2"><span>2.2 Frontend System</span><span class="toc-num">4</span></div>
+  <div class="toc-entry l2"><span>2.3 API Communication Layer</span><span class="toc-num">5</span></div>
+  <div class="toc-entry l1"><span>3. Image Processing Engine</span><span class="toc-num">5</span></div>
+  <div class="toc-entry l2"><span>3.1 Image Loading &amp; Decoding</span><span class="toc-num">6</span></div>
+  <div class="toc-entry l2"><span>3.2 Pixel Extraction &amp; Memory Layout</span><span class="toc-num">6</span></div>
+  <div class="toc-entry l2"><span>3.3 RGB Byte Stream Generation</span><span class="toc-num">7</span></div>
+  <div class="toc-entry l2"><span>3.4 Image Reconstruction &amp; Encoding</span><span class="toc-num">7</span></div>
+  <div class="toc-entry l1"><span>4. Encryption Pipeline</span><span class="toc-num">8</span></div>
+  <div class="toc-entry l1"><span>5. Algorithm Implementations</span><span class="toc-num">9</span></div>
+  <div class="toc-entry l2"><span>5.1 Caesar Cipher</span><span class="toc-num">9</span></div>
+  <div class="toc-entry l2"><span>5.2 Multiplicative Cipher</span><span class="toc-num">10</span></div>
+  <div class="toc-entry l2"><span>5.3 Affine Cipher</span><span class="toc-num">11</span></div>
+  <div class="toc-entry l2"><span>5.4 Playfair Cipher (16×16)</span><span class="toc-num">12</span></div>
+  <div class="toc-entry l2"><span>5.5 Hill Cipher</span><span class="toc-num">13</span></div>
+  <div class="toc-entry l2"><span>5.6 RC4 Stream Cipher</span><span class="toc-num">14</span></div>
+  <div class="toc-entry l2"><span>5.7 Rail Fence Cipher</span><span class="toc-num">15</span></div>
+  <div class="toc-entry l1"><span>6. Mathematical Analysis</span><span class="toc-num">16</span></div>
+  <div class="toc-entry l1"><span>7. Frontend Visualization System</span><span class="toc-num">18</span></div>
+  <div class="toc-entry l1"><span>8. Security Analysis</span><span class="toc-num">19</span></div>
+  <div class="toc-entry l1"><span>9. Comparison &amp; Evaluation</span><span class="toc-num">20</span></div>
+  <div class="toc-entry l1"><span>10. Limitations &amp; Future Scope</span><span class="toc-num">21</span></div>
+  <div class="toc-entry l1"><span>11. Conclusion</span><span class="toc-num">21</span></div>
+  <div class="toc-entry l1"><span>12. References</span><span class="toc-num">22</span></div>
+</div>
+</div>
 
-    <h2>1. Introduction</h2>
-    <p>Cryptography protects data by transforming plaintext into ciphertext using a key and a reversible algorithm. When applied to images, the data is processed as bytes or pixels, and the output must still reconstruct a valid image. Image encryption is important for medical imaging, surveillance, personal media, and secure communication.</p>
+<!-- ═══════════════════════════════════════════
+     1. INTRODUCTION
+     ═══════════════════════════════════════════ -->
+<div class="page-break">
+<h2>1. Introduction</h2>
+<p>Digital images are among the most transmitted forms of data in modern communication systems. Whether in medical imaging, surveillance, personal communication, or cloud storage, the protection of visual information against unauthorised access is a critical engineering concern. Image encryption transforms a visually meaningful photograph into a perceptually random pattern of pixels by applying a reversible mathematical function to the underlying byte representation of the image's colour channels.</p>
 
-    <h2>2. Project Objective</h2>
-    <p>The objective is to analyze how multiple cryptographic algorithms behave internally on image data, show their mathematical operations, and demonstrate how byte-level or matrix-level transformations alter the visible image. The project also compares the algorithms by security, complexity, and practical relevance.</p>
+<p>This project, <strong>CipherVault</strong>, implements a complete image encryption and decryption system that operates at the pixel byte level. Rather than encrypting image files as opaque binary streams (as a file encryption tool would), CipherVault decodes each image into its RGBA pixel buffer, extracts the three colour channels (R, G, B) into a linear byte array, applies a cryptographic transformation to every byte, and reconstructs a valid PNG image from the transformed channel data. This approach produces images that remain structurally valid — the encrypted output is a displayable PNG — while containing visually scrambled pixel data.</p>
 
-    <h2>3. System Requirements</h2>
-    <div class="grid2">
-      <div>
-        <h3>Hardware</h3>
-        <p>Minimum x64 processor, 4 GB RAM, and sufficient disk space for project files and sample images.</p>
-      </div>
-      <div>
-        <h3>Software</h3>
-        <p>C++17 compiler, CMake, modern browser, and header-only dependencies for the backend server.</p>
-      </div>
-    </div>
+<p>Seven cryptographic algorithms are implemented: three classical substitution ciphers (Caesar, Multiplicative, Affine), one digraph substitution cipher (Playfair), one matrix-based cipher (Hill), one stream cipher (RC4), and one transposition cipher (Rail Fence). All algorithms operate on the RGB byte stream of the image with modulus 256 to remain within the valid byte range.</p>
 
-    <h2>4. Project Architecture</h2>
-    <p>The system consists of a browser-based frontend and a C++ backend. The frontend accepts image files, previews them, and forwards requests to the backend when server-side processing is required. The backend decodes PNG data, applies the selected transformation to RGB bytes, and re-encodes the result.</p>
+<h2>2. System Architecture</h2>
+<p>The system is divided into two communicating subsystems: a compiled C++17 backend server and a browser-based frontend. The backend hosts the image-processing engine and all cryptographic algorithm implementations. The frontend handles user interaction, image upload, processing animation, and result display. All encryption and decryption computation occurs exclusively in the backend.</p>
 
-    <div class="figure mermaid">flowchart LR
-      FE[Frontend] -->|Upload image / choose algorithm| API[API Request]
-      API --> BE[Backend C++ Processor]
-      BE --> OUT[Encrypted / Decrypted Image]
-      OUT --> FE
-    </div>
-    <div class="caption">Figure 1: Overall system architecture</div>
-
-    <h2>5. Complete Image Processing & Pixel Transformation Pipeline</h2>
-    <p>This section describes the full internal path an image follows before, during, and after encryption. The emphasis is on binary loading, decoding, pixel extraction, byte-stream generation, memory layout, transformation, and image reconstruction.</p>
-
-    <h3>5.1 Image Loading and Binary Decoding</h3>
-    <p>An image begins as a file selected by the user. The frontend reads the file as binary data and sends it to the image decoder. The decoder extracts width, height, and channel count, then converts the image into an in-memory pixel buffer. At this stage, the image is no longer treated as a visual object but as a structured memory array.</p>
-    <table>
-      <thead><tr><th>Stage</th><th>Internal Result</th><th>Purpose</th></tr></thead>
-      <tbody>
-        <tr><td>File selection</td><td>PNG/JPG binary stream</td><td>Load image from disk or browser</td></tr>
-        <tr><td>Decoding</td><td>Width, height, channels</td><td>Understand image structure</td></tr>
-        <tr><td>Buffer allocation</td><td>RGBA memory buffer</td><td>Hold pixels in RAM</td></tr>
-        <tr><td>Byte serialization</td><td>Flattened RGB byte stream</td><td>Prepare encryption input</td></tr>
-      </tbody>
-    </table>
-    <div class="figure mermaid">flowchart TB
-      F[Image file] --> D[Image decoder]
-      D --> P[Pixel extraction]
-      P --> S[RGB channel separation]
-      S --> B[Byte array conversion]
-      B --> I[Encryption input buffer]
-    </div>
-    <div class="caption">Figure 2: Image loading and byte-buffer creation</div>
-
-    <h3>5.2 Pixel Extraction and Memory Layout</h3>
-    <p>Pixels are stored row by row in memory. Each pixel contains three color bytes, usually interpreted as R, G, and B, while alpha may be preserved separately. The extraction step reads each pixel from the decoded image buffer and appends its channels into a linear sequence.</p>
-    <table>
-      <thead><tr><th>Pixel</th><th>RGB values</th><th>Flattened form</th><th>Byte stream</th></tr></thead>
-      <tbody>
-        <tr><td>(x,y)</td><td>R=120, G=64, B=200</td><td>[120, 64, 200]</td><td>RGB byte stream</td></tr>
-      </tbody>
-    </table>
-    <div class="figure mermaid">flowchart TB
-      A[Pixel (R,G,B)] --> B[R = 120]
-      B --> C[G = 64]
-      C --> D[B = 200]
-      D --> E[[120, 64, 200]]
-      E --> F[BYTE STREAM]
-    </div>
-    <div class="caption">Figure 3: Pixel-to-byte transformation</div>
-    <p>The layout is row-major in memory: pixels are read left to right across a row, then continued on the next row. This means the encryption engine operates on a linear stream even though the image is two-dimensional.</p>
-
-    <h3>5.3 Image-to-Byte Conversion</h3>
-    <p>The decoded image is transformed into a mathematical data structure. The 2D pixel matrix becomes a serialized byte vector. This flattening is essential because cryptographic algorithms work on numbers, not on visual shapes. The conversion process preserves ordering so that the encrypted stream can later be reconstructed into image pixels.</p>
-    <div class="note">
-      Pixel matrix → serialized RGB vector → encryption input buffer → transformed ciphertext vector → reconstructed pixel matrix.
-    </div>
-
-    <h3>5.4 Encryption Engine Internal Workflow</h3>
-    <p>The complete internal encryption pipeline is shown below. This is the core of the project.</p>
-    <div class="figure mermaid">flowchart TB
-      I[IMAGE] --> X[PIXEL EXTRACTION]
-      X --> Y[BYTE CONVERSION]
-      Y --> K[KEY GENERATION / KEY PARSING]
-      K --> E[ALGORITHM ENGINE]
-      E --> M[MATHEMATICAL TRANSFORMATION]
-      M --> C[CIPHERTEXT BYTE ARRAY]
-      C --> R[PIXEL RECONSTRUCTION]
-      R --> O[ENCRYPTED IMAGE]
-    </div>
-    <div class="caption">Figure 4: Full encryption engine pipeline</div>
-
-    <h3>5.5 Encrypted Image Reconstruction</h3>
-    <p>After transformation, the ciphertext byte array is grouped back into pixels. The bytes are mapped to RGB triples, placed into an image buffer, and encoded as PNG or another image format. This step turns mathematical output back into a valid encrypted image file.</p>
-    <div class="figure mermaid">flowchart TB
-      A[Encrypted bytes] --> B[Pixel reconstruction]
-      B --> C[Image buffer]
-      C --> D[PNG/JPG encoder]
-      D --> E[Encrypted image file]
-    </div>
-    <div class="caption">Figure 5: Encrypted image reconstruction pipeline</div>
-
-    <h3>5.6 Decryption Reverse Pipeline</h3>
-    <p>The decryption path reverses the same memory flow. The encrypted image is decoded, bytes are extracted, the inverse mathematical operation is applied, and the original pixel matrix is rebuilt.</p>
-    <div class="figure mermaid">flowchart TB
-      A[Encrypted image] --> B[Pixel extraction]
-      B --> C[Byte stream]
-      C --> D[Decryption engine]
-      D --> E[Original pixel restoration]
-      E --> F[Image reconstruction]
-    </div>
-    <div class="caption">Figure 6: Reverse decryption pipeline</div>
-
-    <h3>5.7 Memory-Level Visualization</h3>
-    <table>
-      <thead><tr><th>Structure</th><th>Role</th><th>Example</th></tr></thead>
-      <tbody>
-        <tr><td>Vector</td><td>Dynamic byte storage</td><td>RGB byte stream</td></tr>
-        <tr><td>Array</td><td>Fixed channel layout</td><td>Pixel channel bytes</td></tr>
-        <tr><td>Matrix</td><td>2D pixel organization</td><td>Rows and columns of image</td></tr>
-        <tr><td>Buffer</td><td>Intermediate memory image</td><td>Decoded or encrypted frame</td></tr>
-      </tbody>
-    </table>
-    <p>Internal processing can be summarized as: file bytes → decoded frame buffer → pixel matrix → RGB byte stream → transformed buffer → reconstructed image.</p>
-
-    <h2>6. Mathematical Analysis & Working Nature</h2>
-    <p>This section gives the internal mathematical behavior of each algorithm, including stepwise byte calculations, pixel transformation examples, key derivation behavior, and the nature of the cipher.</p>
-
-    <div class="alg">
-      <h3>6.1 Caesar Cipher</h3>
-      <p><strong>Nature:</strong> Additive substitution cipher.</p>
-      <p><strong>Encryption:</strong> \(C_i = (P_i + k) \bmod 256\)</p>
-      <p><strong>Decryption:</strong> \(P_i = (C_i - k) \bmod 256\)</p>
-      <p><strong>Working nature:</strong> Each byte is shifted independently. The algorithm does not mix neighboring pixels, so image structure is still partly visible.</p>
-      <table>
-        <thead><tr><th>Input Byte</th><th>Key</th><th>Operation</th><th>Output Byte</th></tr></thead>
-        <tbody>
-          <tr><td>120</td><td>3</td><td>(120 + 3) mod 256</td><td>123</td></tr>
-          <tr><td>255</td><td>10</td><td>(255 + 10) mod 256</td><td>9</td></tr>
-          <tr><td>0</td><td>5</td><td>(0 + 5) mod 256</td><td>5</td></tr>
-        </tbody>
-      </table>
-      <p><strong>Pixel example:</strong> RGB (120, 200, 45) with k=7 becomes (127, 207, 52).</p>
-      <div class="figure mermaid">flowchart TB
-        A[Input bytes] --> B[Add key k]
-        B --> C[mod 256]
-        C --> D[Ciphertext bytes]
-      </div>
-      <div class="caption">Figure 2: Caesar internal workflow</div>
-    </div>
-
-    <div class="alg">
-      <h3>6.2 Multiplicative Cipher</h3>
-      <p><strong>Nature:</strong> Multiplicative substitution cipher.</p>
-      <p><strong>Encryption:</strong> \(C_i = (aP_i) \bmod 256\), with \(\gcd(a,256)=1\)</p>
-      <p><strong>Decryption:</strong> \(P_i = a^{-1}C_i \bmod 256\)</p>
-      <p><strong>Inverse calculation:</strong> find \(a^{-1}\) such that \(aa^{-1}\equiv1\pmod{256}\). For example, \(5^{-1}\equiv205\) because \(5\cdot205=1025\equiv1\pmod{256}\).</p>
-      <table>
-        <thead><tr><th>Input Byte</th><th>Key</th><th>Operation</th><th>Output Byte</th></tr></thead>
-        <tbody>
-          <tr><td>4</td><td>5</td><td>(5 × 4) mod 256</td><td>20</td></tr>
-          <tr><td>20</td><td>205</td><td>(205 × 20) mod 256</td><td>4</td></tr>
-        </tbody>
-      </table>
-      <p><strong>Pixel example:</strong> RGB (12, 34, 56) with a=5 becomes (60, 170, 24).</p>
-      <div class="figure mermaid">flowchart TB
-        A[Plain bytes] --> B[Multiply by a]
-        B --> C[mod 256]
-        C --> D[Ciphertext]
-        D --> E[Multiply by a^-1]
-      </div>
-      <div class="caption">Figure 3: Multiplicative cipher workflow</div>
-    </div>
-
-    <div class="alg">
-      <h3>6.3 Affine Cipher</h3>
-      <p><strong>Nature:</strong> Linear substitution cipher combining multiplication and addition.</p>
-      <p><strong>Encryption:</strong> \(C_i = (aP_i + b) \bmod 256\)</p>
-      <p><strong>Decryption:</strong> \(P_i = a^{-1}(C_i - b) \bmod 256\)</p>
-      <p><strong>Derivation:</strong> Starting from \(C = aP + b\), subtract \(b\) and multiply by \(a^{-1}\) to recover plaintext.</p>
-      <table>
-        <thead><tr><th>Input Byte</th><th>Key</th><th>Operation</th><th>Output Byte</th></tr></thead>
-        <tbody>
-          <tr><td>10</td><td>a=5,b=8</td><td>(5 × 10 + 8) mod 256</td><td>58</td></tr>
-          <tr><td>58</td><td>a^-1=205,b=8</td><td>205 × (58 - 8) mod 256</td><td>10</td></tr>
-        </tbody>
-      </table>
-      <p><strong>Pixel example:</strong> RGB (20, 40, 60), a=5, b=12 gives (112, 212, 56).</p>
-      <div class="figure mermaid">flowchart TB
-        A[Input bytes] --> B[Multiply by a]
-        B --> C[Add b]
-        C --> D[mod 256]
-        D --> E[Ciphertext]
-      </div>
-      <div class="caption">Figure 4: Affine cipher workflow</div>
-    </div>
-
-    <div class="alg">
-      <h3>6.4 Playfair Cipher</h3>
-      <p><strong>Nature:</strong> Digraph substitution cipher adapted here to a 16×16 byte square.</p>
-      <p><strong>Working nature:</strong> Two bytes are processed together. A 256-byte key square is generated from the seed key, then pairwise rules are applied depending on row and column positions.</p>
-      <p><strong>Rules:</strong> Same row shifts right, same column shifts down, otherwise rectangle corners are swapped.</p>
-      <table>
-        <thead><tr><th>Pair Input</th><th>Rule</th><th>Result</th></tr></thead>
-        <tbody>
-          <tr><td>(a,b)</td><td>Same row</td><td>Shift both right by 1</td></tr>
-          <tr><td>(x,y)</td><td>Same column</td><td>Shift both down by 1</td></tr>
-          <tr><td>(p,q)</td><td>Rectangle</td><td>Swap columns</td></tr>
-        </tbody>
-      </table>
-      <p><strong>Pixel example:</strong> RGB bytes are grouped into pairs, so the visible effect is pairwise scrambling of color bytes while preserving overall byte count.</p>
-      <div class="figure mermaid">flowchart TB
-        A[Input byte stream] --> B[Build 16x16 key square]
-        B --> C[Process byte pairs]
-        C --> D[Row/Column/Rectangle rule]
-        D --> E[Ciphertext pairs]
-      </div>
-      <div class="caption">Figure 5: Playfair byte-pair processing</div>
-    </div>
-
-    <div class="alg">
-      <h3>6.5 Hill Cipher</h3>
-      <p><strong>Nature:</strong> Matrix-based block cipher.</p>
-      <p><strong>Encryption:</strong> \(\mathbf{C}=K\mathbf{P}\bmod256\)</p>
-      <p><strong>Decryption:</strong> \(\mathbf{P}=K^{-1}\mathbf{C}\bmod256\)</p>
-      <p><strong>Matrix inverse:</strong> for \(K=\begin{pmatrix}a&b\\c&d\end{pmatrix}\), \(\det K=ad-bc\). If \(\gcd(\det K,256)=1\), then \(K^{-1}=(\det K)^{-1}\operatorname{adj}(K)\bmod256\).</p>
-      <table>
-        <thead><tr><th>Plain Vector</th><th>Key Matrix</th><th>Operation</th><th>Cipher Vector</th></tr></thead>
-        <tbody>
-          <tr><td>[10, 20]^T</td><td>[[3, 3],[2, 5]]</td><td>[3×10+3×20, 2×10+5×20] mod 256</td><td>[90, 120]^T</td></tr>
-        </tbody>
-      </table>
-      <p><strong>Pixel example:</strong> adjacent RGB bytes are grouped into blocks, so one changed byte affects multiple outputs. This creates better diffusion than simple substitution.</p>
-      <div class="figure mermaid">flowchart TB
-        A[Input blocks] --> B[Key matrix K]
-        B --> C[Multiply K × P]
-        C --> D[mod 256]
-        D --> E[Ciphertext blocks]
-      </div>
-      <div class="caption">Figure 6: Hill matrix workflow</div>
-    </div>
-
-    <div class="alg">
-      <h3>6.6 Rail Fence Cipher</h3>
-      <p><strong>Nature:</strong> Transposition cipher.</p>
-      <p><strong>Working nature:</strong> The byte values are not changed, only their positions are permuted in a zig-zag rail pattern. This preserves the histogram but scrambles the spatial order of pixels.</p>
-      <table>
-        <thead><tr><th>Index</th><th>Operation</th><th>Output</th></tr></thead>
-        <tbody>
-          <tr><td>0..N</td><td>Assign by zig-zag rails</td><td>Permuted stream</td></tr>
-        </tbody>
-      </table>
-      <p><strong>Pixel behavior:</strong> image structure becomes visually scrambled while byte distribution remains unchanged.</p>
-      <div class="figure mermaid">flowchart TB
-        A[Input stream] --> B[Rail mapping]
-        B --> C[Zig-zag permutation]
-        C --> D[Ciphertext stream]
-      </div>
-      <div class="caption">Figure 7: Rail Fence permutation workflow</div>
-    </div>
-
-    <div class="alg">
-      <h3>6.7 Diffie-Hellman Key Exchange</h3>
-      <p><strong>Nature:</strong> Asymmetric key exchange protocol, not a direct image cipher.</p>
-      <p><strong>Equations:</strong> \(A=g^a\bmod p\), \(B=g^b\bmod p\), shared key \(s=B^a\bmod p=A^b\bmod p=g^{ab}\bmod p\).</p>
-      <p><strong>Worked example:</strong> with \(p=23\), \(g=5\), \(a=6\), \(b=15\): \(A=8\), \(B=19\), shared secret \(s=2\).</p>
-      <p><strong>Working nature:</strong> The protocol derives a shared symmetric key, which can then be used to encrypt image bytes with a symmetric cipher.</p>
-      <div class="figure mermaid">flowchart TB
-        A[Choose p,g] --> B[Compute public values]
-        B --> C[Exchange A and B]
-        C --> D[Compute shared secret]
-        D --> E[Use shared key for image encryption]
-      </div>
-      <div class="caption">Figure 8: Diffie-Hellman workflow</div>
-    </div>
-
-    <div class="alg">
-      <h3>6.8 RSA Algorithm</h3>
-      <p><strong>Nature:</strong> Asymmetric public-key algorithm.</p>
-      <p><strong>Key generation:</strong> choose primes \(p,q\), compute \(n=pq\), \(\phi(n)=(p-1)(q-1)\), choose \(e\), compute \(d\equiv e^{-1}\pmod{\phi(n)}\).</p>
-      <p><strong>Encryption:</strong> \(C=M^e\bmod n\)</p>
-      <p><strong>Decryption:</strong> \(M=C^d\bmod n\)</p>
-      <p><strong>Worked example:</strong> \(p=61,q=53\Rightarrow n=3233,\phi=3120\). With \(e=17\), the modular inverse is \(d=2753\). For \(M=65\), encryption gives \(C=2790\), and decryption restores \(65\).</p>
-      <table>
-        <thead><tr><th>Message</th><th>Key</th><th>Operation</th><th>Output</th></tr></thead>
-        <tbody>
-          <tr><td>65</td><td>e=17</td><td>65^17 mod 3233</td><td>2790</td></tr>
-          <tr><td>2790</td><td>d=2753</td><td>2790^2753 mod 3233</td><td>65</td></tr>
-        </tbody>
-      </table>
-      <p><strong>Working nature:</strong> RSA is better for key encapsulation than encrypting whole images directly.</p>
-      <div class="figure mermaid">flowchart TB
-        A[Prime selection] --> B[Compute n and phi]
-        B --> C[Choose e]
-        C --> D[Compute d]
-        D --> E[Encrypt key or small message]
-      </div>
-      <div class="caption">Figure 9: RSA key and encryption workflow</div>
-    </div>
-
-    <div class="alg">
-      <h3>6.9 RC4 Stream Cipher</h3>
-      <p><strong>Nature:</strong> Stream cipher based on XOR keystream generation.</p>
-      <p><strong>KSA:</strong> initialize \(S[0..255]\), then permute using the key. <strong>PRGA:</strong> produce keystream bytes and XOR them with plaintext bytes.</p>
-      <p><strong>Encryption / decryption:</strong> \(C_i = P_i \oplus K_i\), and because XOR is self-inverse, \(P_i = C_i \oplus K_i\).</p>
-      <table>
-        <thead><tr><th>Plain Byte</th><th>Keystream Byte</th><th>Operation</th><th>Cipher Byte</th></tr></thead>
-        <tbody>
-          <tr><td>170</td><td>95</td><td>170 XOR 95</td><td>245</td></tr>
-          <tr><td>245</td><td>95</td><td>245 XOR 95</td><td>170</td></tr>
-        </tbody>
-      </table>
-      <p><strong>Working nature:</strong> RC4 changes byte values through XOR, producing strong byte scrambling if the keystream is unique. However, practical biases and key reuse make it unsuitable for modern secure systems.</p>
-      <div class="figure mermaid">flowchart TB
-        A[Input bytes] --> B[KSA key scheduling]
-        B --> C[PRGA keystream generation]
-        C --> D[XOR with plaintext]
-        D --> E[Ciphertext bytes]
-      </div>
-      <div class="caption">Figure 10: RC4 internal workflow</div>
-    </div>
-
-    <h2>7. Internal Workflow Nature and Image Transformation</h2>
-    <p>Image bytes enter the algorithm as RGB channel values. Depending on the cipher, each byte may be shifted, multiplied, substituted, permuted, mixed by a matrix, or XORed with a keystream. The transformed stream is then reassembled into an image. Algorithms with only substitution preserve some patterns; transposition preserves byte values but moves positions; matrix and XOR-based ciphers create stronger visual disruption.</p>
-
-    <div class="figure mermaid">flowchart LR
-      A[Plain image bytes] --> B[Key processing]
-      B --> C[Encryption engine]
-      C --> D[Ciphertext bytes]
-      D --> E[Image reconstruction]
-    </div>
-    <div class="caption">Figure 11: Generic image encryption pipeline</div>
-
-    <h2>8. Flowchart Improvements</h2>
-    <p>Each algorithm can be visualized with its own key-generation and processing loop. The report emphasizes byte-by-byte or block-by-block processing rather than a generic high-level flow only.</p>
-
-    <h2>9. Image Processing Section</h2>
-    <p>The backend decodes PNG into RGBA, processes only RGB bytes, preserves alpha, and writes the transformed buffer back to PNG. In mathematical terms, pixels are treated as byte vectors. For substitution ciphers, each channel changes independently. For Hill, bytes are mixed within blocks. For RC4, bytes are XORed with a keystream. The resulting image often shows altered colors, noise-like scrambling, or scrambled spatial order depending on the algorithm nature.</p>
-
-    <h2>10. Security Analysis</h2>
-    <table>
-      <thead><tr><th>Algorithm</th><th>Nature</th><th>Security</th><th>Reason</th></tr></thead>
-      <tbody>
-        <tr><td>Caesar</td><td>Substitution</td><td>Very Weak</td><td>Small key space</td></tr>
-        <tr><td>Multiplicative</td><td>Substitution</td><td>Weak</td><td>Linear mapping, easy to analyze</td></tr>
-        <tr><td>Affine</td><td>Substitution</td><td>Weak</td><td>Still linear over mod 256</td></tr>
-        <tr><td>Playfair</td><td>Digraph substitution</td><td>Weak-Moderate</td><td>Statistical patterns remain</td></tr>
-        <tr><td>Hill</td><td>Matrix cipher</td><td>Moderate</td><td>Linear algebra attacks possible</td></tr>
-        <tr><td>Rail Fence</td><td>Transposition</td><td>Very Weak</td><td>Only permutes bytes</td></tr>
-        <tr><td>DH / RSA</td><td>Asymmetric</td><td>High for key exchange</td><td>Used to secure symmetric key distribution</td></tr>
-        <tr><td>RC4</td><td>Stream cipher</td><td>Deprecated</td><td>Known biases and reuse issues</td></tr>
-      </tbody>
-    </table>
-
-    <h2>11. Comparison Tables</h2>
-    <table>
-      <thead><tr><th>Algorithm</th><th>Security</th><th>Complexity</th><th>Speed</th><th>Suitability for Image Encryption</th><th>Modern Relevance</th></tr></thead>
-      <tbody>
-        <tr><td>Caesar</td><td>Very Low</td><td>O(N)</td><td>Very Fast</td><td>Poor</td><td>Educational only</td></tr>
-        <tr><td>Multiplicative</td><td>Low</td><td>O(N)</td><td>Very Fast</td><td>Poor</td><td>Historical</td></tr>
-        <tr><td>Affine</td><td>Low</td><td>O(N)</td><td>Very Fast</td><td>Poor</td><td>Historical</td></tr>
-        <tr><td>Playfair</td><td>Low-Moderate</td><td>O(N)</td><td>Fast</td><td>Low</td><td>Educational</td></tr>
-        <tr><td>Hill (2×2)</td><td>Moderate</td><td>O(N)</td><td>Fast</td><td>Moderate</td><td>Educational / analytical</td></tr>
-        <tr><td>Rail Fence</td><td>Very Low</td><td>O(N)</td><td>Very Fast</td><td>Poor</td><td>Historical</td></tr>
-        <tr><td>DH</td><td>High</td><td>Crypto-level</td><td>N/A</td><td>Key exchange only</td><td>Relevant</td></tr>
-        <tr><td>RSA</td><td>High</td><td>Crypto-level</td><td>Slow</td><td>Key encapsulation</td><td>Relevant</td></tr>
-        <tr><td>RC4</td><td>Weak / deprecated</td><td>O(N)</td><td>Fast</td><td>Legacy only</td><td>Not recommended</td></tr>
-      </tbody>
-    </table>
-
-    <h2>12. Advantages</h2>
-    <p>The project compares multiple cipher families, shows real image byte behavior, and provides a full-stack demonstration of image encryption and decryption using a modular architecture.</p>
-
-    <h2>13. Limitations</h2>
-    <p>Classical ciphers are not secure for production use. Some algorithms are conceptual or educational in nature. Hill is limited to small matrices in the current implementation, and secure asymmetric workflows would require a dedicated big-number library.</p>
-
-    <h2>14. Future Scope</h2>
-    <p>Future work should include authenticated encryption such as AES-GCM, secure key exchange with real RSA/DH libraries, stronger image-dedicated cryptosystems, and automated verification of reversibility and security.</p>
-
-    <h2>15. Conclusion</h2>
-    <p>This report demonstrates the mathematical behavior of diverse cryptographic algorithms on image data. It highlights how byte transformations, transpositions, matrix operations, and keystream XOR affect the visual and security properties of encrypted images.</p>
-
-    <h2>16. References</h2>
-    <p>Stallings, W. <em>Cryptography and Network Security</em>. Schneier, B. <em>Applied Cryptography</em>. cpp-httplib documentation. stb image library documentation. Standard cryptography references on RSA, Diffie-Hellman, and stream ciphers.</p>
-
-    <p class="small">Placeholders for screenshots and additional diagrams can be inserted before final PDF export if needed.</p>
+<div class="diagram">
+  <div class="diagram-title">Figure 1 — High-Level System Architecture</div>
+  <div class="hflow">
+    <div class="hbox">Browser<br>Frontend</div>
+    <div class="harrow">⟵ HTTP/JSON ⟶</div>
+    <div class="hbox">REST API<br>localhost:5000</div>
+    <div class="harrow">⟶</div>
+    <div class="hbox">C++ Encryption<br>Engine</div>
+    <div class="harrow">⟶</div>
+    <div class="hbox">Image<br>Processing<br>Pipeline</div>
   </div>
+</div>
+
+<h3>2.1 Backend Module Structure</h3>
+<p>The backend is organised into five distinct namespaces, each encapsulating a single domain of responsibility. This structure eliminates the monolithic single-file pattern and makes each component independently testable and replaceable.</p>
+
+<div class="code-block">backend/cpp/
+├── core/
+│   ├── ImageLoader        — stb_image based PNG/JPG decoder, validates dimensions
+│   ├── PixelProcessor     — extracts and reconstructs RGB byte streams
+│   └── ImageReconstructor — stb_image_write PNG encoder, streams response
+│
+├── algorithms/
+│   ├── CipherBase         — abstract interface: encrypt(), decrypt(), validateKey()
+│   ├── CaesarCipher       — additive shift mod 256
+│   ├── MultiplicativeCipher — multiplicative mod 256, requires gcd(key,256)=1
+│   ├── AffineCipher       — (ax + b) mod 256, combined linear transform
+│   ├── PlayfairCipher     — 16×16 substitution square, digraph pairing
+│   ├── HillCipher         — n×n matrix multiply mod 256 (n=2 or 3)
+│   ├── RC4Cipher          — KSA + PRGA keystream, XOR with RGB stream
+│   └── RailFenceCipher    — zigzag transposition with r rails
+│
+├── math/
+│   ├── ModularArithmetic  — extGCD, modInverse, modPow, isCoprime
+│   └── MatrixOperations   — multiply, determinant, adjugate, modular inverse
+│
+├── processing/
+│   ├── CipherFactory      — creates cipher objects from string identifiers
+│   ├── EncryptionPipeline — orchestrates: load → extract → encrypt → encode
+│   └── DecryptionPipeline — orchestrates: load → extract → decrypt → encode
+│
+└── main.cpp               — cpp-httplib server, CORS, multipart form handler</div>
+
+<h3>2.2 Frontend System</h3>
+<p>The frontend (<span class="mono">frontend/</span>) is a single-page application with no build system or external framework. Three files constitute the complete frontend: <span class="mono">index.html</span>, <span class="mono">styles.css</span>, and <span class="mono">app.js</span>.</p>
+
+<p><span class="mono">app.js</span> performs the following roles: it renders algorithm selection cards dynamically, checks backend availability every 15 seconds via <span class="mono">GET /api/health</span>, handles file upload through a drag-and-drop zone, constructs multipart <span class="mono">FormData</span> with the image and cipher parameters, sends it to the backend, receives the encrypted PNG blob, draws it on a result canvas, and exposes a download button. The browser performs no cryptographic computation — all cipher operations occur in C++.</p>
+
+<h3>2.3 API Communication Layer</h3>
+<p>Three HTTP endpoints are exposed by the backend on <span class="mono">http://0.0.0.0:5000</span>.</p>
+
+<table>
+  <thead><tr><th>Method</th><th>Endpoint</th><th>Request</th><th>Response</th></tr></thead>
+  <tbody>
+    <tr><td>POST</td><td>/api/encrypt</td><td>multipart/form-data: image, algorithm, key, param</td><td>image/png (encrypted)</td></tr>
+    <tr><td>POST</td><td>/api/decrypt</td><td>multipart/form-data: image, algorithm, key, param</td><td>image/png (decrypted)</td></tr>
+    <tr><td>GET</td><td>/api/health</td><td>—</td><td>JSON: {status, algorithms}</td></tr>
+  </tbody>
+</table>
+<p class="tbl-caption">Table 1 — REST API Endpoints</p>
+
+<div class="diagram no-break">
+  <div class="diagram-title">Figure 2 — Complete API Communication Flow</div>
+  <div class="api-flow">
+    <div class="api-col">
+      <div class="api-col-title">FRONTEND (Browser)</div>
+      <div class="api-step">User selects image + algorithm + key</div>
+      <div class="api-step">canvas.toBlob() → PNG Blob</div>
+      <div class="api-step active">FormData.append(image, algorithm, key, param)</div>
+      <div class="api-step active">fetch('http://localhost:5000/api/encrypt', POST)</div>
+      <div class="api-step">await res.blob()</div>
+      <div class="api-step result">URL.createObjectURL(blob) → canvas</div>
+      <div class="api-step result">Download enabled</div>
+    </div>
+    <div class="api-center">
+      <div class="api-arrow">→</div>
+      <div class="api-arrow">←</div>
+    </div>
+    <div class="api-col">
+      <div class="api-col-title">BACKEND (C++ Engine)</div>
+      <div class="api-step">req.form.get_file("image")</div>
+      <div class="api-step">ImageLoader::loadFromMemory()</div>
+      <div class="api-step active">PixelProcessor::extractRGBStream()</div>
+      <div class="api-step active">CipherFactory::createCipher(algorithm, key)</div>
+      <div class="api-step active">EncryptionPipeline::encryptImageToBytes()</div>
+      <div class="api-step result">ImageReconstructor::encodePNG()</div>
+      <div class="api-step result">res.set_content_provider(png_bytes)</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     3. IMAGE PROCESSING ENGINE
+     ═══════════════════════════════════════════ -->
+<div class="page-break">
+<h2>3. Image Processing Engine</h2>
+<p>The image processing engine is the foundation upon which all cryptographic transformations are built. It translates between the opaque binary representation of an image file and the structured, addressable memory layout that algorithms require. Understanding this translation is essential for understanding why image encryption produces visually scrambled but structurally valid output.</p>
+
+<h3>3.1 Image Loading and Decoding</h3>
+<p>When a user submits an image, the frontend serialises the canvas content as a PNG blob and attaches it to a <span class="mono">FormData</span> object. The backend's <span class="mono">ImageLoader::loadFromMemory()</span> receives the raw binary content and calls <span class="mono">stbi_load_from_memory()</span> with the <span class="mono">STBI_rgb_alpha</span> flag, which forces four-channel (RGBA) output regardless of the source format. This normalisation ensures that PNG, JPEG, and WebP inputs produce identically structured buffers.</p>
+
+<div class="callout">
+  <strong>Why force RGBA?</strong> JPEG images have 3 channels; PNG may have 1, 2, 3, or 4. Normalising to RGBA at load time means the encryption engine always sees a predictable 4-byte-per-pixel layout. The alpha channel is preserved unchanged across all operations.
+</div>
+
+<p>The result is an <span class="mono">ImageData</span> structure containing the decoded pixel buffer as a contiguous <span class="mono">std::vector&lt;unsigned char&gt;</span> of size <span class="mono">width × height × 4</span> bytes:</p>
+
+<div class="code-block">struct ImageData {
+    int width, height, channels;            // channels = 4 (RGBA)
+    std::vector&lt;unsigned char&gt; pixels;      // size = width * height * 4
+};</div>
+
+<h3>3.2 Pixel Extraction and Memory Layout</h3>
+<p>Pixels are stored in row-major order. For an image of width <em>W</em> and height <em>H</em>, the byte at position <em>i</em> within a row <em>y</em> and column <em>x</em> is addressed as:</p>
+
+<div class="math-block">
+  <span class="eq">offset(x, y) = (y × W + x) × 4</span>
+  <span class="eq">R = pixels[offset],  G = pixels[offset+1],  B = pixels[offset+2],  A = pixels[offset+3]</span>
+</div>
+
+<p><span class="mono">PixelProcessor::extractRGBStream()</span> traverses every pixel in row-major order and produces a linear byte vector containing only the R, G, B bytes — the alpha channel is excluded from transformation:</p>
+
+<div class="code-block">// From PixelProcessor.cpp
+for (size_t i = 0; i &lt; pixelCount; ++i) {
+    size_t base = i * img.channels;       // channels = 4
+    stream.push_back(img.pixels[base+0]); // R
+    stream.push_back(img.pixels[base+1]); // G
+    stream.push_back(img.pixels[base+2]); // B
+    // alpha (base+3) intentionally excluded
+}</div>
+
+<p>For a 1920×1080 image, this produces a byte stream of 1920 × 1080 × 3 = 6,220,800 bytes. This is the exact input to the algorithm engine.</p>
+
+<div class="diagram">
+  <div class="diagram-title">Figure 3 — Pixel Buffer to Byte Stream Conversion</div>
+  <div class="pipeline">
+    <div class="pipe-box">RGBA Pixel Buffer  [W × H × 4 bytes]</div>
+    <div class="pipe-arrow">↓</div>
+    <div class="pipe-box accent">Row-major traversal: pixel (0,0) → (W-1, H-1)</div>
+    <div class="pipe-arrow">↓</div>
+    <div class="pipe-box">Extract R, G, B  (skip A per pixel)</div>
+    <div class="pipe-arrow">↓</div>
+    <div class="pipe-box green">Linear RGB Stream  [W × H × 3 bytes]</div>
+    <div class="pipe-arrow">↓</div>
+    <div class="pipe-box gold">Input to Algorithm Engine</div>
+  </div>
+</div>
+
+<h3>3.3 RGB Byte Stream Generation</h3>
+<p>The stream is a <span class="mono">std::vector&lt;unsigned char&gt;</span> where values are in the range [0, 255]. Each algorithm receives this vector and returns a transformed vector of equal size. The mathematical operations are all defined modulo 256, ensuring that the output values remain valid byte values and can be directly written back as pixel colours.</p>
+
+<p>Some algorithms (Playfair, Hill) operate on pairs or blocks of bytes rather than individual bytes. For these, the stream may be padded with trailing zero bytes to reach a multiple of the block size. This padding is accounted for during decryption by trimming the stream back to its original length before reconstruction.</p>
+
+<h3>3.4 Image Reconstruction and Encoding</h3>
+<p>After encryption, <span class="mono">PixelProcessor::reconstructRGBStream()</span> writes the transformed bytes back into the RGBA pixel buffer, placing each byte at its original R/G/B position while leaving the alpha channel at its original value. <span class="mono">ImageReconstructor::encodePNG()</span> then calls <span class="mono">stbi_write_png_to_func()</span> with a callback that appends bytes to an output vector, which is streamed directly to the HTTP response via <span class="mono">res.set_content_provider()</span>. No temporary files are written to disk at any stage.</p>
+
+<div class="diagram">
+  <div class="diagram-title">Figure 4 — Encrypted Byte Stream to Image Reconstruction</div>
+  <div class="pipeline">
+    <div class="pipe-box gold">Encrypted RGB Stream  [W × H × 3 bytes]</div>
+    <div class="pipe-arrow">↓</div>
+    <div class="pipe-box accent">Write R,G,B back into RGBA buffer at original offsets</div>
+    <div class="pipe-arrow">↓</div>
+    <div class="pipe-box">Alpha channel values unchanged</div>
+    <div class="pipe-arrow">↓</div>
+    <div class="pipe-box accent">stbi_write_png_to_func() → in-memory PNG bytes</div>
+    <div class="pipe-arrow">↓</div>
+    <div class="pipe-box green">HTTP Response: image/png  (encrypted image)</div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     4. ENCRYPTION PIPELINE
+     ═══════════════════════════════════════════ -->
+<div class="page-break">
+<h2>4. Complete Encryption Pipeline</h2>
+<p>The following diagram represents the full end-to-end pipeline from user action in the browser to the delivery of the encrypted PNG. Every stage has a corresponding software component in the codebase.</p>
+
+<div class="diagram">
+  <div class="diagram-title">Figure 5 — Complete End-to-End Encryption Pipeline</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:640px;margin:0 auto;">
+    <div class="pipeline">
+      <div class="pipe-box" style="background:#112233;color:#99ccff;">BROWSER: User uploads image</div>
+      <div class="pipe-arrow">↓</div>
+      <div class="pipe-box" style="background:#112233;color:#99ccff;">canvas.toBlob() → PNG Blob</div>
+      <div class="pipe-arrow">↓</div>
+      <div class="pipe-box" style="background:#112233;color:#99ccff;">FormData: image + algorithm + key</div>
+      <div class="pipe-arrow">↓</div>
+      <div class="pipe-box" style="background:#112233;color:#99ccff;">POST /api/encrypt → C++ Server</div>
+    </div>
+    <div class="pipeline">
+      <div class="pipe-box" style="background:#0f2718;color:#88ddaa;">ImageLoader::loadFromMemory()</div>
+      <div class="pipe-arrow">↓</div>
+      <div class="pipe-box" style="background:#0f2718;color:#88ddaa;">PixelProcessor::extractRGBStream()</div>
+      <div class="pipe-arrow">↓</div>
+      <div class="pipe-box" style="background:#0f2718;color:#88ddaa;">CipherFactory → Algorithm Engine</div>
+      <div class="pipe-arrow">↓</div>
+      <div class="pipe-box" style="background:#0f2718;color:#88ddaa;">cipher.encrypt(rgbStream)</div>
+      <div class="pipe-arrow">↓</div>
+      <div class="pipe-box" style="background:#0f2718;color:#88ddaa;">reconstructRGBStream()</div>
+      <div class="pipe-arrow">↓</div>
+      <div class="pipe-box" style="background:#0f2718;color:#88ddaa;">encodePNG() → HTTP Response</div>
+    </div>
+  </div>
+</div>
+
+<p>The <span class="mono">EncryptionPipeline</span> and <span class="mono">DecryptionPipeline</span> classes act as thin orchestrators. They receive a pre-constructed cipher object from the factory, call pixel extraction, invoke the cipher, and call reconstruction. This separation means that adding a new algorithm requires only adding a new class implementing <span class="mono">CipherBase</span> and registering it in <span class="mono">CipherFactory</span> — the pipeline code does not change.</p>
+
+<div class="code-block">// EncryptionPipeline::encryptImageToBytes() — actual implementation
+std::vector&lt;unsigned char&gt; EncryptionPipeline::encryptImageToBytes(const Core::ImageData& img) {
+    // 1. Extract RGB byte stream (alpha excluded)
+    auto rgbStream = Core::PixelProcessor::extractRGBStream(img);
+    // 2. Apply cipher transformation
+    auto encryptedStream = cipher_-&gt;encrypt(rgbStream);
+    // 3. Rebuild image with transformed bytes
+    Core::ImageData output = img;
+    Core::PixelProcessor::reconstructRGBStream(output, encryptedStream);
+    // 4. Encode as PNG and return
+    return Core::ImageReconstructor::encodePNG(output);
+}</div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     5. ALGORITHM IMPLEMENTATIONS
+     ═══════════════════════════════════════════ -->
+<div class="page-break">
+<h2>5. Algorithm Implementations</h2>
+
+<!-- ── 5.1 CAESAR ── -->
+<h3>5.1 Caesar Cipher</h3>
+<h4>Nature</h4>
+<p>The Caesar cipher is a monoalphabetic additive substitution cipher. When applied to image bytes, each channel value is shifted by a constant integer <em>k</em> in modular arithmetic over Z<sub>256</sub>. Because the shift is uniform across all pixels and channels, the statistical distribution of values is preserved — a histogram attack trivially recovers the key.</p>
+
+<h4>Mathematical Operation</h4>
+<div class="math-block">
+  <span class="label">(5.1)</span>
+  <span class="eq">Encryption:  C = (P + k)  mod 256</span>
+  <span class="eq">Decryption:  P = (C − k)  mod 256</span>
+  <span class="eq">Key space:   k ∈ {0, 1, …, 255}</span>
+</div>
+
+<h4>Pixel Transformation Example</h4>
+<div class="pixel-transform">
+  <div class="pixel-box">
+    <div class="px-label">Original Pixel</div>
+    <div class="px-r">R = 120</div>
+    <div class="px-g">G =  64</div>
+    <div class="px-b">B = 200</div>
+  </div>
+  <div class="pixel-op">
+    ──( k=7 )──▶
+    <span class="op-name">add 7 mod 256</span>
+  </div>
+  <div class="pixel-box">
+    <div class="px-label">Encrypted Pixel</div>
+    <div class="px-r">R = 127</div>
+    <div class="px-g">G =  71</div>
+    <div class="px-b">B = 207</div>
+  </div>
+</div>
+
+<h4>Security on Images</h4>
+<p>Caesar encryption on images is visually ineffective — the output image retains structural outlines because the relative differences between neighbouring pixels are unchanged. Statistical attacks recover <em>k</em> in at most 255 trials. It serves as a baseline demonstration only.</p>
+
+<!-- ── 5.2 MULTIPLICATIVE ── -->
+<h3>5.2 Multiplicative Cipher</h3>
+<h4>Nature</h4>
+<p>The multiplicative cipher replaces each byte value by its product with a key <em>a</em> in Z<sub>256</sub>. For decryption to be possible, <em>a</em> must be invertible modulo 256, which requires that gcd(<em>a</em>, 256) = 1. Because 256 = 2<sup>8</sup>, the key must be an odd integer. The backend validates this using <span class="mono">ModularArithmetic::isCoprime(a, 256)</span> before processing begins.</p>
+
+<h4>Mathematical Operation</h4>
+<div class="math-block">
+  <span class="label">(5.2)</span>
+  <span class="eq">Encryption:  C = (a × P)  mod 256</span>
+  <span class="eq">Decryption:  P = (a⁻¹ × C)  mod 256</span>
+  <span class="eq">where a⁻¹ is found via Extended Euclidean Algorithm: a⁻¹ such that a × a⁻¹ ≡ 1 (mod 256)</span>
+</div>
+
+<h4>Pixel Transformation Example (a = 5)</h4>
+<div class="pixel-transform">
+  <div class="pixel-box">
+    <div class="px-label">Original Pixel</div>
+    <div class="px-r">R = 120</div>
+    <div class="px-g">G =  64</div>
+    <div class="px-b">B = 200</div>
+  </div>
+  <div class="pixel-op">
+    ─(×5 mod 256)─▶
+    <span class="op-name">mult mod 256</span>
+  </div>
+  <div class="pixel-box">
+    <div class="px-label">Encrypted Pixel</div>
+    <div class="px-r">R = 88  <small>(600 mod 256)</small></div>
+    <div class="px-g">G = 64  <small>(320 mod 256)</small></div>
+    <div class="px-b">B = 232 <small>(1000 mod 256)</small></div>
+  </div>
+</div>
+
+<p>The decryption key for <em>a</em> = 5 is <em>a</em>⁻¹ = 205, since 5 × 205 = 1025 ≡ 1 (mod 256). The backend computes this automatically via the Extended Euclidean Algorithm in <span class="mono">ModularArithmetic::modInverse()</span>.</p>
+
+<!-- ── 5.3 AFFINE ── -->
+<h3>5.3 Affine Cipher</h3>
+<h4>Nature</h4>
+<p>The affine cipher generalises both Caesar (b ≠ 0, a = 1) and multiplicative (a ≠ 1, b = 0) into a single linear transformation over Z<sub>256</sub>. Two keys are required: a multiplicative component <em>a</em> (must be coprime to 256) and an additive component <em>b</em>. The frontend accepts these as a comma-separated pair, e.g. <span class="mono">5,8</span>.</p>
+
+<h4>Mathematical Operation</h4>
+<div class="math-block">
+  <span class="label">(5.3)</span>
+  <span class="eq">Encryption:  C = (a × P + b)  mod 256</span>
+  <span class="eq">Decryption:  P = a⁻¹ × (C − b)  mod 256</span>
+  <span class="eq">Condition:   gcd(a, 256) = 1</span>
+</div>
+
+<h4>Pixel Transformation Example (a=5, b=8)</h4>
+<div class="pixel-transform">
+  <div class="pixel-box">
+    <div class="px-label">Original Pixel</div>
+    <div class="px-r">R = 120</div>
+    <div class="px-g">G =  64</div>
+    <div class="px-b">B = 200</div>
+  </div>
+  <div class="pixel-op">
+    (5P+8) mod 256▶
+    <span class="op-name">affine</span>
+  </div>
+  <div class="pixel-box">
+    <div class="px-label">Encrypted Pixel</div>
+    <div class="px-r">R = 96  <small>(608 mod 256)</small></div>
+    <div class="px-g">G = 72  <small>(328 mod 256)</small></div>
+    <div class="px-b">B = 240 <small>(1008 mod 256)</small></div>
+  </div>
+</div>
+
+<!-- ── 5.4 PLAYFAIR ── -->
+<h3>5.4 Playfair Cipher (16×16 Extended)</h3>
+<h4>Nature</h4>
+<p>The classical Playfair cipher uses a 5×5 grid for 25 characters. This implementation extends the concept to a 16×16 grid of all 256 byte values (0–255), enabling it to operate on arbitrary binary data including image bytes. Byte pairs are processed using the same three positional rules as the original cipher: same row (shift right/left), same column (shift down/up), or rectangle swap.</p>
+
+<h4>Key Square Construction</h4>
+<p>The 16×16 substitution square is constructed from the key string by inserting key bytes first (avoiding duplicates), then filling remaining positions with all unused byte values 0–255. The key can be a plain string or a hexadecimal string of even length. This deterministic construction means the same key always produces the same square, enabling inverse operations on decryption.</p>
+
+<h4>Digraph Processing Rules</h4>
+<div class="math-block">
+  <span class="eq">For byte pair (P₁, P₂) at grid positions (r₁,c₁) and (r₂,c₂):</span>
+  <span class="eq">Same row (r₁ = r₂):    C₁ = square[r₁][(c₁+1) mod 16],  C₂ = square[r₂][(c₂+1) mod 16]</span>
+  <span class="eq">Same col (c₁ = c₂):    C₁ = square[(r₁+1) mod 16][c₁],   C₂ = square[(r₂+1) mod 16][c₂]</span>
+  <span class="eq">Rectangle:              C₁ = square[r₁][c₂],              C₂ = square[r₂][c₁]</span>
+</div>
+<p>Decryption uses shift −1 (i.e., +15 mod 16) for row and column rules, and the rectangle rule is its own inverse.</p>
+
+<!-- ── 5.5 HILL ── -->
+<h3>5.5 Hill Cipher</h3>
+<h4>Nature</h4>
+<p>The Hill cipher applies a linear algebraic transformation over Z<sub>256</sub>. An <em>n×n</em> key matrix is multiplied by a column vector of <em>n</em> plaintext bytes to produce a ciphertext vector. This implementation supports 2×2 and 3×3 matrices. The key requirement is that the matrix determinant must be invertible modulo 256, i.e., gcd(det(K), 256) = 1.</p>
+
+<h4>Mathematical Operation</h4>
+<div class="math-block">
+  <span class="label">(5.5)</span>
+  <span class="eq">Encryption:  C = K · P  (mod 256)</span>
+  <span class="eq">Decryption:  P = K⁻¹ · C  (mod 256)</span>
+  <span class="eq">where K⁻¹ = det(K)⁻¹ · adj(K)  (mod 256)</span>
+  <br>
+  <span class="eq">2×2 example with K = [[3,2],[5,7]]:</span>
+  <span class="eq">det(K) = 3·7 − 2·5 = 11,   det(K)⁻¹ mod 256 = 163  (since 11·163 ≡ 1 mod 256)</span>
+  <span class="eq">adj(K) = [[7,−2],[−5,3]],   K⁻¹ = 163·[[7,254],[251,3]] mod 256</span>
+</div>
+
+<h4>Block Processing on Image Bytes</h4>
+<p>The RGB byte stream is divided into blocks of size <em>n</em> (2 or 3). Each block is multiplied by the key matrix modulo 256. Since the RGB stream length is 3 × (number of pixels), which is always divisible by 3, no padding is needed for 3×3 matrices. For 2×2 matrices, a single zero byte may be appended if the stream length is odd. This byte is stripped during decryption.</p>
+
+<div class="pixel-transform">
+  <div class="pixel-box">
+    <div class="px-label">Input block (n=2)</div>
+    <div>P = [120, 64]</div>
+    <br>
+    <div class="small">K = [[3,2],[5,7]]</div>
+  </div>
+  <div class="pixel-op">
+    ─ K·P mod 256 ─▶
+    <span class="op-name">matrix mult</span>
+  </div>
+  <div class="pixel-box">
+    <div class="px-label">Encrypted block</div>
+    <div>C[0] = (3×120 + 2×64) mod 256 = 232</div>
+    <div>C[1] = (5×120 + 7×64) mod 256 = 192</div>
+  </div>
+</div>
+
+<!-- ── 5.6 RC4 ── -->
+<h3>5.6 RC4 Stream Cipher</h3>
+<h4>Nature</h4>
+<p>RC4 is a synchronous stream cipher that generates a pseudo-random byte stream (keystream) from the key, then XORs this stream with the plaintext. Because XOR is its own inverse and the keystream is deterministic given the key, encryption and decryption are identical operations. RC4 is particularly suitable for image encryption because it operates on individual bytes and does not require padding.</p>
+
+<h4>Key Scheduling Algorithm (KSA)</h4>
+<p>The KSA initialises a 256-byte substitution array S with the identity permutation, then scrambles it using the key bytes:</p>
+<div class="code-block">S[i] = i  for i in 0..255
+j = 0
+for i in 0..255:
+    j = (j + S[i] + key[i mod len(key)]) mod 256
+    swap(S[i], S[j])</div>
+
+<h4>Pseudo-Random Generation Algorithm (PRGA)</h4>
+<p>The PRGA generates one keystream byte per input byte:</p>
+<div class="code-block">i = 0, j = 0
+for each input byte P[k]:
+    i = (i + 1) mod 256
+    j = (j + S[i]) mod 256
+    swap(S[i], S[j])
+    K[k] = S[(S[i] + S[j]) mod 256]   // keystream byte
+    C[k] = P[k] XOR K[k]              // encrypted byte</div>
+
+<h4>Mathematical Operation</h4>
+<div class="math-block">
+  <span class="label">(5.6)</span>
+  <span class="eq">Encryption:  C[k] = P[k] ⊕ KeyStream[k]</span>
+  <span class="eq">Decryption:  P[k] = C[k] ⊕ KeyStream[k]   (identical — XOR is self-inverse)</span>
+</div>
+
+<h4>Pixel Transformation Example (key = "secret")</h4>
+<p>The first keystream byte produced by the KSA/PRGA with key "secret" is deterministic. For the pixel R=120: if the first keystream byte is 0xAE = 174, then C = 120 XOR 174 = 214. The original value is recovered by 214 XOR 174 = 120.</p>
+
+<!-- ── 5.7 RAIL FENCE ── -->
+<h3>5.7 Rail Fence Cipher</h3>
+<h4>Nature</h4>
+<p>Rail Fence is a transposition cipher — it rearranges bytes without changing their values. The bytes are written in a zigzag pattern across <em>r</em> rows ("rails"), then read off row by row to produce the ciphertext. Unlike substitution ciphers, the statistical distribution of byte values is unchanged; the cipher's effect is purely positional reordering. Its visual effect on images is a characteristic striping distortion.</p>
+
+<h4>Zigzag Transposition</h4>
+<p>For a sequence of bytes B[0..n-1] and <em>r</em> rails, each byte is assigned to rail <em>rail(i)</em> following a bouncing pattern: 0, 1, …, r-1, r-2, …, 1, 0, 1, … The ciphertext is formed by concatenating all bytes on rail 0, then rail 1, …, rail r−1.</p>
+
+<div class="math-block">
+  <span class="label">(5.7)</span>
+  <span class="eq">For r=3 and input [B₀ B₁ B₂ B₃ B₄ B₅ B₆ B₇ B₈ ...]:</span>
+  <span class="eq">Rail 0:  B₀  B₄  B₈  ...</span>
+  <span class="eq">Rail 1:  B₁  B₃  B₅  B₇  ...</span>
+  <span class="eq">Rail 2:  B₂  B₆  ...</span>
+  <span class="eq">Ciphertext = [Rail 0 bytes] + [Rail 1 bytes] + [Rail 2 bytes]</span>
+</div>
+
+<p>Decryption requires computing the rail index for each position in the ciphertext and reversing the interleaving. The backend implementation in <span class="mono">RailFenceCipher::decryptRailFence()</span> precomputes the rail assignment for all positions, builds offset arrays per rail, then reassembles the original sequence in one pass.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     6. MATHEMATICAL ANALYSIS
+     ═══════════════════════════════════════════ -->
+<div class="page-break">
+<h2>6. Mathematical Analysis</h2>
+
+<h3>6.1 Extended Euclidean Algorithm</h3>
+<p>The core mathematical primitive used by Caesar decryption, Multiplicative, Affine, and Hill ciphers is the modular multiplicative inverse, computed by the Extended Euclidean Algorithm. The backend's <span class="mono">ModularArithmetic::extendedGCD(a, b)</span> and <span class="mono">modInverse(a, m)</span> implement this directly.</p>
+
+<div class="math-block">
+  <span class="label">(6.1)</span>
+  <span class="eq"><strong>Extended GCD:</strong>  Find x, y such that  a·x + b·y = gcd(a, b)</span>
+  <span class="eq">If gcd(a, m) = 1, then x is the modular inverse of a modulo m: a·x ≡ 1 (mod m)</span>
+  <br>
+  <span class="eq"><strong>Example:</strong>  Find 5⁻¹ mod 256</span>
+  <span class="eq">gcd(5, 256): 256 = 51×5 + 1  →  1 = 256 − 51×5</span>
+  <span class="eq">Therefore x = −51 ≡ 205 (mod 256)</span>
+  <span class="eq">Verification: 5 × 205 = 1025 = 4×256 + 1 ≡ 1 (mod 256)  ✓</span>
+</div>
+
+<h3>6.2 Hill Cipher Matrix Inversion</h3>
+<p>For a 2×2 key matrix K, the modular matrix inverse is:</p>
+
+<div class="math-block">
+  <span class="label">(6.2)</span>
+  <span class="eq">K = [[a, b], [c, d]]</span>
+  <span class="eq">det(K) = a·d − b·c</span>
+  <span class="eq">adj(K) = [[d, −b], [−c, a]]</span>
+  <span class="eq">K⁻¹ = det(K)⁻¹ · adj(K)  (mod 256)</span>
+  <br>
+  <span class="eq"><strong>Worked example:</strong>  K = [[3, 2], [5, 7]]</span>
+  <span class="eq">det(K) = 21 − 10 = 11</span>
+  <span class="eq">11⁻¹ mod 256 = 163  (since 11 × 163 = 1793 = 7×256 + 1)</span>
+  <span class="eq">adj(K) mod 256 = [[7, 254], [251, 3]]  (−2 mod 256 = 254, −5 mod 256 = 251)</span>
+  <span class="eq">K⁻¹ = 163 × [[7, 254], [251, 3]] mod 256 = [[141, 50], [21, 233]]</span>
+</div>
+
+<h3>6.3 RC4 Key Space</h3>
+<p>The key space of RC4 is determined by the key length. For a key of <em>l</em> bytes (l = 1..256), the number of distinct keys is 256<sup>l</sup>. Even at l = 8 bytes, the key space is 256<sup>8</sup> = 2<sup>64</sup> ≈ 1.8 × 10<sup>19</sup>, which is computationally infeasible to brute-force. The primary practical weakness of RC4 is key reuse and statistical biases in the early keystream, which do not apply in the batch image encryption context used here.</p>
+
+<h3>6.4 Modular Arithmetic Over Z₂₅₆ for Image Processing</h3>
+<p>All ciphers operate over Z<sub>256</sub> because image channel values are unsigned 8-bit integers in the range [0, 255]. The C++ implementation uses bitwise AND to enforce this bound efficiently:</p>
+<div class="math-block">
+  <span class="eq">result = (a × b + c) &amp; 0xFF  ≡  (a × b + c)  mod 256</span>
+</div>
+<p>This works because 256 = 2<sup>8</sup> and masking with 0xFF = 2<sup>8</sup> − 1 is equivalent to computing mod 2<sup>8</sup>. For subtraction, the two's complement wrap-around is corrected as <span class="mono">(a − b) &amp; 0xFF</span>, which produces the correct non-negative residue.</p>
+
+<table>
+  <thead><tr><th>Operation</th><th>Formula</th><th>C++ Implementation</th></tr></thead>
+  <tbody>
+    <tr><td>Addition mod 256</td><td>(P + k) mod 256</td><td class="mono">(P + k) &amp; 0xFF</td></tr>
+    <tr><td>Subtraction mod 256</td><td>(P − k) mod 256</td><td class="mono">(P − k) &amp; 0xFF</td></tr>
+    <tr><td>Multiplication mod 256</td><td>(a · P) mod 256</td><td class="mono">(a * P) &amp; 0xFF</td></tr>
+    <tr><td>Modular inverse</td><td>a⁻¹: a·a⁻¹ ≡ 1 (mod 256)</td><td class="mono">ModularArithmetic::modInverse(a, 256)</td></tr>
+    <tr><td>XOR</td><td>P ⊕ K</td><td class="mono">P ^ K</td></tr>
+  </tbody>
+</table>
+<p class="tbl-caption">Table 2 — Modular Arithmetic Operations on Image Bytes</p>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     7. FRONTEND VISUALIZATION SYSTEM
+     ═══════════════════════════════════════════ -->
+<div class="page-break">
+<h2>7. Frontend Visualization System</h2>
+<p>The frontend is designed not merely as a form interface but as a visualisation layer that communicates the state of the real backend processing pipeline to the user through animation and live feedback.</p>
+
+<h3>7.1 Backend Health Monitor</h3>
+<p>On page load, <span class="mono">app.js</span> calls <span class="mono">GET /api/health</span> with a 4-second timeout using <span class="mono">AbortSignal.timeout(4000)</span>. If the backend responds, the server status badge turns green with a pulsing animation. If the backend is offline, it shows an orange badge with the message "Backend offline — start ImageCrypto.exe". This check repeats every 15 seconds. Encrypt and decrypt buttons remain disabled until a healthy backend is confirmed.</p>
+
+<h3>7.2 Upload Zone and Image Preview</h3>
+<p>The drag-and-drop upload zone accepts files via three mechanisms: file dialog (<span class="mono">browseBtn</span>), drag-and-drop events on the zone div, and clipboard paste (<span class="mono">paste</span> event). Once loaded, the image is drawn to <span class="mono">canvasOriginal</span>. After encryption, the result PNG blob is drawn to <span class="mono">canvasResult</span>, providing a side-by-side comparison. Metadata — pixel dimensions and file size — is displayed below each canvas.</p>
+
+<h3>7.3 Processing Overlay Animation</h3>
+<p>When the Encrypt or Decrypt button is pressed, a full-screen overlay appears showing three concentric rotating rings (cyan, purple, pink) and a six-step progress list reflecting the actual backend processing stages. The steps are updated sequentially as the frontend progresses through its request lifecycle:</p>
+
+<table>
+  <thead><tr><th>Step ID</th><th>Frontend Action</th><th>Backend Action</th></tr></thead>
+  <tbody>
+    <tr><td>upload</td><td>FormData constructed, fetch() called</td><td>Request received</td></tr>
+    <tr><td>decode</td><td>Awaiting response</td><td>ImageLoader::loadFromMemory()</td></tr>
+    <tr><td>extract</td><td>Awaiting response</td><td>PixelProcessor::extractRGBStream()</td></tr>
+    <tr><td>cipher</td><td>Awaiting response</td><td>cipher_→encrypt()</td></tr>
+    <tr><td>reconstruct</td><td>res.ok verified</td><td>encodePNG()</td></tr>
+    <tr><td>transfer</td><td>res.blob() resolved</td><td>HTTP stream complete</td></tr>
+  </tbody>
+</table>
+<p class="tbl-caption">Table 3 — Overlay animation steps mapped to backend processing</p>
+
+<h3>7.4 Pipeline Visualisation in UI</h3>
+<p>Between the original and result canvases, a vertical pipeline of four labelled stages is displayed: Decode → Pixels → Cipher → Output. During processing, CSS classes <span class="mono">active</span> and <span class="mono">done</span> are applied sequentially using <span class="mono">activatePipelineStep()</span> and <span class="mono">completePipelineVis()</span>. These classes apply glow borders and colour changes that visually trace the pipeline as the HTTP round trip completes.</p>
+
+<h3>7.5 Live Statistics</h3>
+<p>After a successful response, the statistics panel displays: processing time in milliseconds (measured client-side via <span class="mono">performance.now()</span>), total pixel count (width × height), an approximate entropy value, and the algorithm identifier. These give the user a quantitative sense of the encryption operation just performed.</p>
+
+<h3>7.6 Particle Background</h3>
+<p>A WebGL-free particle system implemented on an HTML5 canvas draws 80 particles (cyan and purple) drifting across the viewport. Pairs of particles within 100 pixels are connected with faint lines, creating a dynamic network effect. This is purely cosmetic and runs in a <span class="mono">requestAnimationFrame</span> loop without affecting the UI event loop.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     8. SECURITY ANALYSIS
+     ═══════════════════════════════════════════ -->
+<div class="page-break">
+<h2>8. Security Analysis</h2>
+
+<h3>8.1 Cryptographic Strength Per Algorithm</h3>
+<table>
+  <thead><tr><th>Algorithm</th><th>Key Space</th><th>Pixel Pattern Leakage</th><th>Brute Force Feasibility</th></tr></thead>
+  <tbody>
+    <tr><td>Caesar</td><td>256</td><td>High — structure visible</td><td>Trivial (256 trials)</td></tr>
+    <tr><td>Multiplicative</td><td>128 (odd keys)</td><td>High — distribution preserved</td><td>Trivial</td></tr>
+    <tr><td>Affine</td><td>128 × 256 = 32,768</td><td>Moderate</td><td>Trivial</td></tr>
+    <tr><td>Playfair</td><td>256! square arrangements</td><td>Low — digraph diffusion</td><td>Computationally hard</td></tr>
+    <tr><td>Hill (2×2)</td><td>Invertible 2×2 matrices mod 256</td><td>Low — matrix diffusion</td><td>Computationally hard</td></tr>
+    <tr><td>Hill (3×3)</td><td>Invertible 3×3 matrices mod 256</td><td>Very low</td><td>Very hard</td></tr>
+    <tr><td>RC4</td><td>256<sup>l</sup> (l = key length)</td><td>Minimal — pseudo-random XOR</td><td>Infeasible for l ≥ 8</td></tr>
+    <tr><td>Rail Fence</td><td>r − 1 (number of rails)</td><td>None — only rearranges</td><td>Trivial (test all rail counts)</td></tr>
+  </tbody>
+</table>
+<p class="tbl-caption">Table 4 — Security Comparison of Implemented Algorithms</p>
+
+<h3>8.2 Specific Vulnerabilities</h3>
+<p><strong>Caesar and Multiplicative</strong> ciphers applied to images are vulnerable to histogram analysis: because each unique input value maps to exactly one output value, the histogram shape is preserved. An attacker can recover the key by comparing histograms.</p>
+
+<p><strong>Hill cipher</strong> is vulnerable to known-plaintext attacks if the attacker has access to a plaintext-ciphertext pair of length ≥ n bytes: solving the system K · P = C mod 256 for K requires only matrix inversion.</p>
+
+<p><strong>RC4</strong> has known statistical weaknesses in the first few bytes of the keystream (Fluhrer–Mantin–Shamir, 2001). For image encryption, discarding the first 256 bytes of keystream (RC4-drop[256]) would mitigate this, though this optimisation is not implemented in the current version.</p>
+
+<p><strong>Rail Fence</strong> provides no confidentiality against statistical analysis — only the positions of bytes change, not their values.</p>
+
+<h3>8.3 System-Level Security</h3>
+<p>The backend performs key validation before any encryption begins. For Multiplicative and Affine ciphers, <span class="mono">isCoprime(key, 256)</span> is checked, and an HTTP 400 response is returned if the key is invalid. For Hill cipher, matrix invertibility is verified by computing <span class="mono">gcd(det(K), 256) = 1</span> before encryption. These checks prevent silent data corruption from uninvertible keys.</p>
+
+<p>CORS headers are set on all responses, allowing the frontend (served from any origin including <span class="mono">file://</span>) to receive the encrypted image. The backend does not validate request origins, which is appropriate for a local development system.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     9. COMPARISON AND EVALUATION
+     ═══════════════════════════════════════════ -->
+<div class="page-break">
+<h2>9. Comparison and Evaluation</h2>
+
+<h3>9.1 Algorithm Performance Characteristics</h3>
+<table>
+  <thead><tr><th>Algorithm</th><th>Type</th><th>Complexity</th><th>Suitable for Large Images</th><th>Reversibility</th></tr></thead>
+  <tbody>
+    <tr><td>Caesar</td><td>Substitution</td><td>O(n)</td><td>✓ Excellent</td><td>Perfect</td></tr>
+    <tr><td>Multiplicative</td><td>Substitution</td><td>O(n)</td><td>✓ Excellent</td><td>Perfect</td></tr>
+    <tr><td>Affine</td><td>Substitution</td><td>O(n)</td><td>✓ Excellent</td><td>Perfect</td></tr>
+    <tr><td>Playfair</td><td>Digraph sub.</td><td>O(n)</td><td>✓ Good</td><td>Perfect</td></tr>
+    <tr><td>Hill (n=2)</td><td>Matrix</td><td>O(n)</td><td>✓ Good</td><td>Perfect</td></tr>
+    <tr><td>Hill (n=3)</td><td>Matrix</td><td>O(n)</td><td>✓ Good</td><td>Perfect</td></tr>
+    <tr><td>RC4</td><td>Stream</td><td>O(n)</td><td>✓ Excellent</td><td>Perfect</td></tr>
+    <tr><td>Rail Fence</td><td>Transposition</td><td>O(n)</td><td>✓ Excellent</td><td>Perfect</td></tr>
+  </tbody>
+</table>
+<p class="tbl-caption">Table 5 — Algorithm Performance (n = total RGB byte count)</p>
+
+<h3>9.2 Visual Encryption Effectiveness</h3>
+<table>
+  <thead><tr><th>Algorithm</th><th>Image Structure Visible?</th><th>Colour Shift</th><th>Statistical Randomness</th></tr></thead>
+  <tbody>
+    <tr><td>Caesar</td><td>Yes — fully visible</td><td>Uniform hue shift</td><td>Low</td></tr>
+    <tr><td>Multiplicative</td><td>Yes — partially</td><td>Non-linear mapping</td><td>Low</td></tr>
+    <tr><td>Affine</td><td>Partially visible</td><td>Linear colour transform</td><td>Moderate</td></tr>
+    <tr><td>Playfair</td><td>No — scrambled</td><td>Complex</td><td>Good</td></tr>
+    <tr><td>Hill</td><td>No — fully scrambled</td><td>Matrix diffusion</td><td>Very good</td></tr>
+    <tr><td>RC4</td><td>No — random noise</td><td>Pseudo-random</td><td>Excellent</td></tr>
+    <tr><td>Rail Fence</td><td>Striped pattern</td><td>None (transposition)</td><td>Low</td></tr>
+  </tbody>
+</table>
+<p class="tbl-caption">Table 6 — Visual Encryption Quality Comparison</p>
+
+<h3>9.3 Key Management Summary</h3>
+<table>
+  <thead><tr><th>Algorithm</th><th>Key Format</th><th>Frontend Input Example</th><th>Validation</th></tr></thead>
+  <tbody>
+    <tr><td>Caesar</td><td>Integer shift</td><td>7</td><td>None (any value valid)</td></tr>
+    <tr><td>Multiplicative</td><td>Odd integer</td><td>5</td><td>gcd(key, 256) = 1</td></tr>
+    <tr><td>Affine</td><td>Two integers a,b</td><td>5,8</td><td>gcd(a, 256) = 1</td></tr>
+    <tr><td>Playfair</td><td>String or hex</td><td>mysecret</td><td>Non-empty</td></tr>
+    <tr><td>Hill 2×2</td><td>4 integers, param=2</td><td>3,2,5,7</td><td>det invertible mod 256</td></tr>
+    <tr><td>Hill 3×3</td><td>9 integers, param=3</td><td>6,24,1,13,16,10,20,17,15</td><td>det invertible mod 256</td></tr>
+    <tr><td>RC4</td><td>String 1–256 chars</td><td>mykey</td><td>Non-empty, length ≤ 256</td></tr>
+    <tr><td>Rail Fence</td><td>Number of rails (param)</td><td>param=3</td><td>2 ≤ rails ≤ 100</td></tr>
+  </tbody>
+</table>
+<p class="tbl-caption">Table 7 — Key Format and Validation Per Algorithm</p>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     10. LIMITATIONS & FUTURE SCOPE
+     ═══════════════════════════════════════════ -->
+<div class="page-break">
+<h2>10. Limitations and Future Scope</h2>
+
+<h3>10.1 Current Limitations</h3>
+<ul>
+  <li><strong>Single-threaded HTTP server</strong> — the cpp-httplib server processes one request at a time. For large images or concurrent users, a thread-pool configuration would be needed.</li>
+  <li><strong>Classical cipher security</strong> — Caesar, Multiplicative, Affine, and Rail Fence ciphers are academically demonstrative but cryptographically weak. They are included for educational comparison, not secure communication.</li>
+  <li><strong>RC4 early bias</strong> — the implementation does not drop the first 256 keystream bytes (RC4-drop[256]), leaving it susceptible to Fluhrer–Mantin–Shamir statistical attacks on the keystream head.</li>
+  <li><strong>No authentication</strong> — there is no MAC or authenticated encryption. An attacker with access to the encrypted image can modify it without detection.</li>
+  <li><strong>16-bit pixel depth not supported</strong> — images with 16-bit channel depth (medical DICOM, high-dynamic-range) are not handled; stb_image decodes them to 8-bit.</li>
+</ul>
+
+<h3>10.2 Future Scope</h3>
+<ul>
+  <li><strong>AES-256 in CBC/GCM mode</strong> — replacing or supplementing RC4 with AES would provide industry-standard security with authenticated encryption.</li>
+  <li><strong>Frequency analysis visualisation</strong> — displaying RGB histograms before and after encryption would visually demonstrate the statistical impact of each cipher on the image data.</li>
+  <li><strong>Entropy calculation</strong> — computing Shannon entropy H(P) = −Σ p(x) log₂ p(x) on the pixel value distribution would quantify the randomness introduced by each cipher.</li>
+  <li><strong>Multi-image batch processing</strong> — extending the API to accept archives of images and process them in parallel using a thread pool.</li>
+  <li><strong>Steganography integration</strong> — embedding a watermark or hidden message within the alpha channel of the encrypted image.</li>
+</ul>
+
+<!-- ═══════════════════════════════════════════
+     11. CONCLUSION
+     ═══════════════════════════════════════════ -->
+<h2>11. Conclusion</h2>
+<p>This project demonstrates a complete, functionally verified image encryption and decryption system implemented as a full-stack application. The C++17 backend implements seven cryptographic algorithms operating at the byte level of image data, connected through a modular pipeline that separates image loading, pixel processing, algorithm execution, and image reconstruction into independent, reusable components. All algorithms produce losslessly reversible encrypted images — decryption with the correct key exactly recovers the original image.</p>
+
+<p>The frontend provides a professional animated interface that visualises the real backend processing pipeline rather than simulating it. Every encryption operation travels from the browser to the C++ engine and back as a real HTTP transaction, making the system a genuine full-stack cryptographic application rather than a client-side demonstration.</p>
+
+<p>The modular architecture makes the system extensible: adding a new cipher requires only implementing the four-method <span class="mono">CipherBase</span> interface and registering the new class in <span class="mono">CipherFactory</span>. The image processing pipeline — decode, extract, transform, reconstruct, encode — remains unchanged regardless of which algorithm is selected.</p>
+
+<p>The project provides a practical platform for studying how classical cryptographic algorithms behave when applied to image data, demonstrating the trade-offs between key complexity, visual encryption quality, and cryptographic security within a unified, interactive system.</p>
+
+<!-- ═══════════════════════════════════════════
+     12. REFERENCES
+     ═══════════════════════════════════════════ -->
+<div class="page-break">
+<h2>12. References</h2>
+<ol>
+  <li>Stinson, D. R. (2006). <em>Cryptography: Theory and Practice</em>, 3rd ed. Chapman &amp; Hall/CRC.</li>
+  <li>Menezes, A. J., van Oorschot, P. C., &amp; Vanstone, S. A. (1996). <em>Handbook of Applied Cryptography</em>. CRC Press. [Available at cacr.uwaterloo.ca/hac/]</li>
+  <li>Rivest, R. (1992). <em>The RC4 Encryption Algorithm</em>. RSA Data Security, Inc.</li>
+  <li>Fluhrer, S., Mantin, I., &amp; Shamir, A. (2001). Weaknesses in the Key Scheduling Algorithm of RC4. <em>Selected Areas in Cryptography</em>, LNCS 2259, pp. 1–24.</li>
+  <li>Hirose, Y. (2023). <em>cpp-httplib: A C++11 single-file header-only HTTP/HTTPS library</em>. GitHub: github.com/yhirose/cpp-httplib.</li>
+  <li>Barrett, S. et al. <em>stb_image and stb_image_write</em> (public domain single-file libraries). GitHub: github.com/nothings/stb.</li>
+  <li>Gonzalez, R. C., &amp; Woods, R. E. (2017). <em>Digital Image Processing</em>, 4th ed. Pearson.</li>
+  <li>ISO/IEC 15948:2004. <em>Portable Network Graphics (PNG): Functional specification</em>.</li>
+</ol>
+</div>
+
 </body>
 </html>

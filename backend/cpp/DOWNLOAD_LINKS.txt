@@ -1,0 +1,70 @@
+================================================================================
+MinGW-w64 POSIX Download Links (Choose ONE)
+================================================================================
+
+OPTION 1: WinLibs (Recommended - Direct Download)
+================================================================================
+Direct Download Link:
+https://github.com/brechtsanders/winlibs_mingw/releases/download/13.2.0-16.0.6-11.0.0-msvcrt-r1/winlibs-x86_64-posix-seh-gcc-13.2.0-mingw-w64msvcrt-11.0.0-r1.zip
+
+File Size: ~110 MB
+Extract to: C:\mingw64
+
+
+OPTION 2: MSYS2 (Alternative - Installer)
+================================================================================
+Download Installer:
+https://github.com/msys2/msys2-installer/releases/download/2024-01-13/msys2-x86_64-20240113.exe
+
+After installation, run in MSYS2 terminal:
+pacman -S mingw-w64-x86_64-gcc
+
+
+OPTION 3: Older Stable Version (If above fails)
+================================================================================
+Direct Download Link:
+https://github.com/brechtsanders/winlibs_mingw/releases/download/11.4.0-10.0.0-msvcrt-r1/winlibs-x86_64-posix-seh-gcc-11.4.0-mingw-w64msvcrt-10.0.0-r1.zip
+
+File Size: ~90 MB
+Extract to: C:\mingw64
+
+
+================================================================================
+Installation Steps (For Option 1 or 3)
+================================================================================
+
+1. Download the ZIP file from link above
+
+2. Extract to C:\mingw64
+   - Right-click ZIP → Extract All → C:\
+   - Or use 7-Zip/WinRAR
+
+3. Add to PATH:
+   - Press Win + Pause → Advanced System Settings
+   - Environment Variables → Path (User) → Edit
+   - Remove: C:\MinGW\bin (old one)
+   - Add: C:\mingw64\bin
+   - Click OK
+
+4. Close ALL command prompts
+
+5. Open NEW Command Prompt and verify:
+   g++ --version
+
+
+================================================================================
+Quick Download with PowerShell
+================================================================================
+
+Open PowerShell as Administrator and run:
+
+Invoke-WebRequest -Uri "https://github.com/brechtsanders/winlibs_mingw/releases/download/13.2.0-16.0.6-11.0.0-msvcrt-r1/winlibs-x86_64-posix-seh-gcc-13.2.0-mingw-w64msvcrt-11.0.0-r1.zip" -OutFile "$env:TEMP\mingw64.zip"
+
+Expand-Archive -Path "$env:TEMP\mingw64.zip" -DestinationPath "C:\" -Force
+
+[Environment]::SetEnvironmentVariable("Path", "C:\mingw64\bin;" + [Environment]::GetEnvironmentVariable("Path", "User"), "User")
+
+Write-Host "Done! Close this window and open NEW Command Prompt"
+
+
+================================================================================

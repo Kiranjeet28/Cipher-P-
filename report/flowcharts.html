@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CipherVault — Flowcharts & Diagrams</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+@page { size: A4; margin: 15mm; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: #fff;
+  color: #111;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 28px 60px;
+}
+h1 { font-size: 20pt; text-align: center; font-weight: 700; margin-bottom: 6px; }
+.doc-sub { text-align: center; font-size: 10pt; color: #666; margin-bottom: 36px; }
+
+/* ── SECTION HEADERS ── */
+.fc-section {
+  page-break-before: always;
+  padding-top: 10px;
+}
+.fc-section:first-of-type { page-break-before: avoid; }
+.fc-title {
+  font-size: 13pt;
+  font-weight: 700;
+  border-left: 5px solid #1a2a6c;
+  padding: 6px 12px;
+  background: #f5f7ff;
+  margin-bottom: 16px;
+  letter-spacing: .01em;
+}
+.fc-subtitle {
+  font-size: 9.5pt;
+  color: #555;
+  margin-bottom: 14px;
+  padding-left: 4px;
+}
+
+/* ── SVG CONTAINER ── */
+.fc-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 0 0 10px;
+  page-break-inside: avoid;
+}
+.fc-caption {
+  text-align: center;
+  font-size: 9pt;
+  color: #444;
+  font-style: italic;
+  margin-bottom: 8px;
+}
+
+/* ── SHARED SVG STYLES (applied inside SVG via CSS classes) ── */
+svg text { font-family: 'Inter', sans-serif; }
+svg .mono { font-family: 'JetBrains Mono', monospace; }
+
+/* ── TWO-COLUMN LAYOUT ── */
+.fc-grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  page-break-inside: avoid;
+}
+.fc-grid2 .fc-wrap { margin-bottom: 0; }
+</style>
+</head>
+<body>
+
+<h1>CipherVault — Flowcharts &amp; System Diagrams</h1>
+<p class="doc-sub">Image Encryption &amp; Decryption System · C++17 Backend · JavaScript Frontend · REST API</p>
+
+<!-- ══════════════════════════════════════════════════
+     FC-1  COMPLETE SYSTEM ARCHITECTURE
+     ══════════════════════════════════════════════════ -->
+<div class="fc-section">
+<div class="fc-title">Figure 1 — Complete System Architecture</div>
+<div class="fc-subtitle">End-to-end flow from user interaction to encrypted image delivery</div>
+<div class="fc-wrap">
+<svg width="760" height="580" viewBox="0 0 760 580" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arr" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 9 3.5, 0 7" fill="#333"/>
+    </marker>
+    <marker id="arrB" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 9 3.5, 0 7" fill="#1a5cbb"/>
+    </marker>
+    <marker id="arrG" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 9 3.5, 0 7" fill="#1a7a44"/>
+    </marker>
+  </defs>
+
+  <!-- FRONTEND COLUMN -->
+  <rect x="30" y="10" width="200" height="560" rx="8" fill="#eef2ff" stroke="#6b82dd" stroke-width="1.5"/>
+  <text x="130" y="36" text-anchor="middle" font-size="10" font-weight="600" fill="#1a2a6c">BROWSER FRONTEND</text>
+
+  <!-- START -->
+  <rect x="55" y="50" width="150" height="36" rx="18" fill="#1a2a6c" stroke="none"/>
+  <text x="130" y="73" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">START</text>
+  <!-- Arrow -->
+  <line x1="130" y1="86" x2="130" y2="106" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Upload Image -->
+  <polygon points="55,108 205,108 195,136 65,136" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="130" y="127" text-anchor="middle" font-size="9.5" fill="#111">User Uploads Image</text>
+  <line x1="130" y1="136" x2="130" y2="156" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Select Algorithm -->
+  <rect x="55" y="156" width="150" height="36" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="130" y="179" text-anchor="middle" font-size="9.5" fill="#111">Select Algorithm + Key</text>
+  <line x1="130" y1="192" x2="130" y2="212" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Click Encrypt -->
+  <rect x="55" y="212" width="150" height="36" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="130" y="231" text-anchor="middle" font-size="9.5" fill="#111">Click Encrypt / Decrypt</text>
+  <text x="130" y="243" text-anchor="middle" font-size="8" fill="#666">btnEncrypt / btnDecrypt</text>
+  <line x1="130" y1="248" x2="130" y2="268" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Validate -->
+  <polygon points="130,268 205,300 130,332 55,300" fill="#fff9e6" stroke="#cc8800" stroke-width="1.5"/>
+  <text x="130" y="296" text-anchor="middle" font-size="9" fill="#111">Backend</text>
+  <text x="130" y="308" text-anchor="middle" font-size="9" fill="#111">Online?</text>
+  <!-- No branch -->
+  <line x1="55" y1="300" x2="30" y2="300" stroke="#cc0000" stroke-width="1.5"/>
+  <line x1="30" y1="300" x2="30" y2="420" stroke="#cc0000" stroke-width="1.5"/>
+  <line x1="30" y1="420" x2="54" y2="420" stroke="#cc0000" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="18" y="363" text-anchor="middle" font-size="8.5" fill="#cc0000" transform="rotate(-90,18,363)">NO → Show Error</text>
+  <!-- Yes branch -->
+  <line x1="130" y1="332" x2="130" y2="352" stroke="#1a7a44" stroke-width="1.5" marker-end="url(#arrG)"/>
+  <text x="140" y="346" font-size="8" fill="#1a7a44">YES</text>
+
+  <!-- Build FormData -->
+  <rect x="55" y="352" width="150" height="36" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="130" y="371" text-anchor="middle" font-size="9" fill="#111">Build FormData</text>
+  <text x="130" y="382" text-anchor="middle" font-size="8" fill="#555" class="mono">image+algo+key+param</text>
+  <line x1="130" y1="388" x2="130" y2="408" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Show Overlay -->
+  <rect x="55" y="408" width="150" height="36" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="130" y="427" text-anchor="middle" font-size="9" fill="#111">Show Processing</text>
+  <text x="130" y="439" text-anchor="middle" font-size="8" fill="#555">Overlay + Animation</text>
+  <line x1="205" y1="426" x2="265" y2="426" stroke="#1a5cbb" stroke-width="2" marker-end="url(#arrB)" stroke-dasharray="5,3"/>
+  <text x="235" y="420" text-anchor="middle" font-size="8" fill="#1a5cbb">POST</text>
+
+  <!-- Render Result -->
+  <rect x="55" y="484" width="150" height="36" rx="4" fill="#e8f7ee" stroke="#1a7a44" stroke-width="1.5"/>
+  <text x="130" y="503" text-anchor="middle" font-size="9" fill="#111">Render Result on Canvas</text>
+  <text x="130" y="515" text-anchor="middle" font-size="8" fill="#555">Enable Download</text>
+
+  <!-- Arrow from API back -->
+  <line x1="265" y1="484" x2="205" y2="494" stroke="#1a7a44" stroke-width="2" marker-end="url(#arr)" stroke-dasharray="5,3"/>
+  <text x="235" y="478" text-anchor="middle" font-size="8" fill="#1a7a44">PNG blob</text>
+
+  <!-- BACKEND COLUMN -->
+  <rect x="280" y="10" width="450" height="560" rx="8" fill="#f0fff4" stroke="#1a7a44" stroke-width="1.5"/>
+  <text x="505" y="36" text-anchor="middle" font-size="10" font-weight="600" fill="#1a5c2a">C++ BACKEND ENGINE (port 5000)</text>
+
+  <!-- Receive Request -->
+  <polygon points="300,50 710,50 700,78 310,78" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="505" y="69" text-anchor="middle" font-size="9.5" fill="#111">Receive POST /api/encrypt or /api/decrypt</text>
+  <line x1="505" y1="78" x2="505" y2="98" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Parse Form -->
+  <rect x="310" y="98" width="390" height="36" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="505" y="117" text-anchor="middle" font-size="9.5" fill="#111">Parse Multipart Form Data</text>
+  <text x="505" y="129" text-anchor="middle" font-size="8" fill="#555" class="mono">req.form.get_file("image") + params</text>
+  <line x1="505" y1="134" x2="505" y2="154" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Validate Image -->
+  <polygon points="505,154 700,186 505,218 310,186" fill="#fff9e6" stroke="#cc8800" stroke-width="1.5"/>
+  <text x="505" y="182" text-anchor="middle" font-size="9" fill="#111">Image Valid?</text>
+  <text x="505" y="194" text-anchor="middle" font-size="8" fill="#666">validateImage()</text>
+  <!-- No -->
+  <line x1="700" y1="186" x2="725" y2="186" stroke="#cc0000" stroke-width="1.5"/>
+  <line x1="725" y1="186" x2="725" y2="260" stroke="#cc0000" stroke-width="1.5"/>
+  <text x="735" y="226" font-size="8" fill="#cc0000">400</text>
+  <!-- Yes -->
+  <line x1="505" y1="218" x2="505" y2="238" stroke="#1a7a44" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="514" y="232" font-size="8" fill="#1a7a44">YES</text>
+
+  <!-- ImageLoader -->
+  <rect x="310" y="238" width="390" height="36" rx="4" fill="#dbeafe" stroke="#1a5cbb" stroke-width="1.5"/>
+  <text x="505" y="257" text-anchor="middle" font-size="9.5" fill="#111">ImageLoader::loadFromMemory()</text>
+  <text x="505" y="269" text-anchor="middle" font-size="8" fill="#555" class="mono">stbi_load → RGBA buffer [W×H×4]</text>
+  <line x1="505" y1="274" x2="505" y2="294" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- PixelProcessor -->
+  <rect x="310" y="294" width="390" height="36" rx="4" fill="#dbeafe" stroke="#1a5cbb" stroke-width="1.5"/>
+  <text x="505" y="313" text-anchor="middle" font-size="9.5" fill="#111">PixelProcessor::extractRGBStream()</text>
+  <text x="505" y="325" text-anchor="middle" font-size="8" fill="#555" class="mono">RGB byte array [W×H×3 bytes]</text>
+  <line x1="505" y1="330" x2="505" y2="350" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- CipherFactory -->
+  <rect x="310" y="350" width="390" height="36" rx="4" fill="#fce7f3" stroke="#9333ea" stroke-width="1.5"/>
+  <text x="505" y="369" text-anchor="middle" font-size="9.5" fill="#111">CipherFactory::createCipher(algorithm, key)</text>
+  <text x="505" y="381" text-anchor="middle" font-size="8" fill="#555" class="mono">Caesar / Affine / Hill / RC4 / ...</text>
+  <line x1="505" y1="386" x2="505" y2="406" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- cipher.encrypt -->
+  <rect x="310" y="406" width="390" height="36" rx="4" fill="#fce7f3" stroke="#9333ea" stroke-width="1.5"/>
+  <text x="505" y="425" text-anchor="middle" font-size="9.5" fill="#111">cipher→encrypt(rgbStream)</text>
+  <text x="505" y="437" text-anchor="middle" font-size="8" fill="#555" class="mono">Mathematical transformation → encrypted bytes</text>
+  <line x1="505" y1="442" x2="505" y2="462" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Reconstruct + Encode -->
+  <rect x="310" y="462" width="390" height="36" rx="4" fill="#dbeafe" stroke="#1a5cbb" stroke-width="1.5"/>
+  <text x="505" y="481" text-anchor="middle" font-size="9.5" fill="#111">reconstructRGBStream() + encodePNG()</text>
+  <text x="505" y="493" text-anchor="middle" font-size="8" fill="#555" class="mono">stbi_write_png_to_func → in-memory PNG</text>
+  <line x1="505" y1="498" x2="505" y2="518" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Stream Response -->
+  <polygon points="310,518 700,518 690,546 320,546" fill="#e8f7ee" stroke="#1a7a44" stroke-width="1.5"/>
+  <text x="505" y="537" text-anchor="middle" font-size="9.5" fill="#111">res.set_content_provider(png_bytes) → HTTP 200</text>
+</svg>
+</div>
+<p class="fc-caption">Figure 1: Complete system architecture — browser frontend (left) and C++ backend engine (right)</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     FC-2  IMAGE PROCESSING PIPELINE
+     ══════════════════════════════════════════════════ -->
+<div class="fc-section">
+<div class="fc-title">Figure 2 — Image Processing Pipeline (Pixel Extraction &amp; Reconstruction)</div>
+<div class="fc-subtitle">Internal byte-level processing from raw image file to encrypted output</div>
+<div class="fc-wrap">
+<svg width="760" height="620" viewBox="0 0 760 620" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="a1" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#333"/></marker>
+    <marker id="a2" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#1a5cbb"/></marker>
+    <marker id="a3" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#7c3aed"/></marker>
+  </defs>
+
+  <!-- LEFT: EXTRACTION PIPELINE -->
+  <rect x="10" y="10" width="360" height="600" rx="8" fill="#f0f4ff" stroke="#6b82dd" stroke-width="1.5"/>
+  <text x="190" y="36" text-anchor="middle" font-size="10" font-weight="600" fill="#1a2a6c">PIXEL EXTRACTION (encode side)</text>
+
+  <!-- START -->
+  <rect x="65" y="52" width="250" height="34" rx="17" fill="#1a2a6c"/>
+  <text x="190" y="74" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">START: Image file received</text>
+  <line x1="190" y1="86" x2="190" y2="106" stroke="#333" stroke-width="1.5" marker-end="url(#a1)"/>
+
+  <!-- Decode -->
+  <polygon points="65,106 315,106 305,134 75,134" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="190" y="125" text-anchor="middle" font-size="9.5" fill="#111">stbi_load_from_memory(data, size)</text>
+  <line x1="190" y1="134" x2="190" y2="154" stroke="#333" stroke-width="1.5" marker-end="url(#a1)"/>
+
+  <!-- RGBA Buffer -->
+  <rect x="65" y="154" width="250" height="46" rx="4" fill="#dbeafe" stroke="#1a5cbb" stroke-width="1.5"/>
+  <text x="190" y="173" text-anchor="middle" font-size="9.5" fill="#111" font-weight="500">RGBA Pixel Buffer</text>
+  <text x="190" y="187" text-anchor="middle" font-size="8.5" fill="#555" class="mono">vector&lt;uchar&gt; [W × H × 4]</text>
+  <text x="190" y="198" text-anchor="middle" font-size="8" fill="#888">pixels[i*4+0]=R, [i*4+1]=G, [i*4+2]=B, [i*4+3]=A</text>
+  <line x1="190" y1="200" x2="190" y2="220" stroke="#333" stroke-width="1.5" marker-end="url(#a1)"/>
+
+  <!-- Loop header -->
+  <rect x="65" y="220" width="250" height="34" rx="4" fill="#fef3c7" stroke="#cc8800" stroke-width="1.5"/>
+  <text x="190" y="233" text-anchor="middle" font-size="9" fill="#111">for each pixel i = 0 to (W×H−1)</text>
+  <text x="190" y="246" text-anchor="middle" font-size="8" fill="#555" class="mono">base = i * 4</text>
+  <line x1="190" y1="254" x2="190" y2="274" stroke="#333" stroke-width="1.5" marker-end="url(#a1)"/>
+
+  <!-- Extract RGB -->
+  <rect x="65" y="274" width="250" height="60" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="190" y="293" text-anchor="middle" font-size="9.5" fill="#111" font-weight="500">Extract RGB Channels</text>
+  <text x="115" y="310" font-size="8.5" fill="#cc2222" class="mono">stream.push(pixels[base+0])  ← R</text>
+  <text x="115" y="322" font-size="8.5" fill="#228822" class="mono">stream.push(pixels[base+1])  ← G</text>
+  <text x="115" y="334" font-size="8.5" fill="#2255cc" class="mono">stream.push(pixels[base+2])  ← B</text>
+  <line x1="190" y1="334" x2="190" y2="354" stroke="#333" stroke-width="1.5" marker-end="url(#a1)"/>
+
+  <!-- Alpha note -->
+  <rect x="65" y="354" width="250" height="28" rx="4" fill="#fff8e1" stroke="#e0b800" stroke-width="1"/>
+  <text x="190" y="373" text-anchor="middle" font-size="8.5" fill="#7a5c00">Alpha channel (base+3) — SKIPPED (preserved)</text>
+  <line x1="190" y1="382" x2="190" y2="402" stroke="#333" stroke-width="1.5" marker-end="url(#a1)"/>
+
+  <!-- Loop decision -->
+  <polygon points="190,402 315,426 190,450 65,426" fill="#fff9e6" stroke="#cc8800" stroke-width="1.5"/>
+  <text x="190" y="430" text-anchor="middle" font-size="9" fill="#111">More pixels?</text>
+  <!-- YES back loop -->
+  <line x1="65" y1="426" x2="30" y2="426" stroke="#cc8800" stroke-width="1.5"/>
+  <line x1="30" y1="426" x2="30" y2="254" stroke="#cc8800" stroke-width="1.5"/>
+  <line x1="30" y1="254" x2="64" y2="237" stroke="#cc8800" stroke-width="1.5" marker-end="url(#a1)"/>
+  <text x="20" y="344" text-anchor="middle" font-size="8" fill="#cc8800" transform="rotate(-90,20,344)">YES (loop)</text>
+  <!-- NO -->
+  <line x1="190" y1="450" x2="190" y2="470" stroke="#1a7a44" stroke-width="1.5" marker-end="url(#a1)"/>
+  <text x="200" y="464" font-size="8" fill="#1a7a44">NO</text>
+
+  <!-- RGB Stream result -->
+  <rect x="65" y="470" width="250" height="46" rx="4" fill="#d1fae5" stroke="#1a7a44" stroke-width="1.5"/>
+  <text x="190" y="489" text-anchor="middle" font-size="9.5" fill="#111" font-weight="500">RGB Byte Stream Ready</text>
+  <text x="190" y="503" text-anchor="middle" font-size="8.5" fill="#555" class="mono">vector&lt;uchar&gt; [W × H × 3 bytes]</text>
+  <text x="190" y="514" text-anchor="middle" font-size="8" fill="#888">Input to Cipher Algorithm Engine</text>
+  <line x1="190" y1="516" x2="190" y2="536" stroke="#333" stroke-width="1.5" marker-end="url(#a1)"/>
+
+  <!-- END extraction -->
+  <rect x="65" y="536" width="250" height="34" rx="17" fill="#1a7a44"/>
+  <text x="190" y="558" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">→ To Algorithm Engine</text>
+
+  <!-- RIGHT: RECONSTRUCTION PIPELINE -->
+  <rect x="390" y="10" width="360" height="600" rx="8" fill="#fef9ff" stroke="#9333ea" stroke-width="1.5"/>
+  <text x="570" y="36" text-anchor="middle" font-size="10" font-weight="600" fill="#7c3aed">IMAGE RECONSTRUCTION (output side)</text>
+
+  <rect x="445" y="52" width="250" height="34" rx="17" fill="#7c3aed"/>
+  <text x="570" y="74" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">START: Encrypted byte stream</text>
+  <line x1="570" y1="86" x2="570" y2="106" stroke="#333" stroke-width="1.5" marker-end="url(#a1)"/>
+
+  <!-- Copy image -->
+  <rect x="445" y="106" width="250" height="34" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="570" y="120" text-anchor="middle" font-size="9.5" fill="#111">Copy original ImageData</text>
+  <text x="570" y="132" text-anchor="middle" font-size="8" fill="#555" class="mono">ImageData output = inputImage</text>
+  <line x1="570" y1="140" x2="570" y2="160" stroke="#333" stroke-width="1.5" marker-end="url(#a1)"/>
+
+  <!-- Loop header -->
+  <rect x="445" y="160" width="250" height="34" rx="4" fill="#fef3c7" stroke="#cc8800" stroke-width="1.5"/>
+  <text x="570" y="173" text-anchor="middle" font-size="9" fill="#111">for each pixel i = 0 to (W×H−1)</text>
+  <text x="570" y="186" text-anchor="middle" font-size="8" fill="#555" class="mono">base = i * 4,  streamIdx = i * 3</text>
+  <line x1="570" y1="194" x2="570" y2="214" stroke="#333" stroke-width="1.5" marker-end="url(#a1)"/>
+
+  <!-- Write back -->
+  <rect x="445" y="214" width="250" height="70" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="570" y="233" text-anchor="middle" font-size="9.5" fill="#111" font-weight="500">Write Encrypted Bytes Back</text>
+  <text x="480" y="252" font-size="8.5" fill="#cc2222" class="mono">pixels[base+0] = stream[idx]    ← R</text>
+  <text x="480" y="264" font-size="8.5" fill="#228822" class="mono">pixels[base+1] = stream[idx+1]  ← G</text>
+  <text x="480" y="276" font-size="8.5" fill="#2255cc" class="mono">pixels[base+2] = stream[idx+2]  ← B</text>
+  <text x="480" y="280" font-size="7.5" fill="#888" class="mono">pixels[base+3] unchanged        ← A</text>
+  <line x1="570" y1="284" x2="570" y2="304" stroke="#333" stroke-width="1.5" marker-end="url(#a1)"/>
+
+  <!-- Loop decision -->
+  <polygon points="570,304 695,328 570,352 445,328" fill="#fff9e6" stroke="#cc8800" stroke-width="1.5"/>
+  <text x="570" y="332" text-anchor="middle" font-size="9" fill="#111">More pixels?</text>
+  <!-- YES -->
+  <line x1="695" y1="328" x2="725" y2="328" stroke="#cc8800" stroke-width="1.5"/>
+  <line x1="725" y1="328" x2="725" y2="177" stroke="#cc8800" stroke-width="1.5"/>
+  <line x1="725" y1="177" x2="696" y2="177" stroke="#cc8800" stroke-width="1.5" marker-end="url(#a1)"/>
+  <text x="737" y="256" text-anchor="middle" font-size="8" fill="#cc8800" transform="rotate(-90,737,256)">YES (loop)</text>
+  <!-- NO -->
+  <line x1="570" y1="352" x2="570" y2="372" stroke="#1a7a44" stroke-width="1.5" marker-end="url(#a1)"/>
+  <text x="580" y="366" font-size="8" fill="#1a7a44">NO</text>
+
+  <!-- RGBA buffer updated -->
+  <rect x="445" y="372" width="250" height="36" rx="4" fill="#dbeafe" stroke="#1a5cbb" stroke-width="1.5"/>
+  <text x="570" y="391" text-anchor="middle" font-size="9.5" fill="#111">RGBA Buffer Updated</text>
+  <text x="570" y="403" text-anchor="middle" font-size="8" fill="#555" class="mono">W×H×4 bytes with encrypted RGB</text>
+  <line x1="570" y1="408" x2="570" y2="428" stroke="#333" stroke-width="1.5" marker-end="url(#a1)"/>
+
+  <!-- PNG encode -->
+  <rect x="445" y="428" width="250" height="46" rx="4" fill="#fce7f3" stroke="#9333ea" stroke-width="1.5"/>
+  <text x="570" y="447" text-anchor="middle" font-size="9.5" fill="#111" font-weight="500">stbi_write_png_to_func()</text>
+  <text x="570" y="460" text-anchor="middle" font-size="8" fill="#555">Callback appends to output vector</text>
+  <text x="570" y="472" text-anchor="middle" font-size="8" fill="#555" class="mono">PNG header + IDAT chunks</text>
+  <line x1="570" y1="474" x2="570" y2="494" stroke="#333" stroke-width="1.5" marker-end="url(#a1)"/>
+
+  <!-- Stream to HTTP -->
+  <polygon points="445,494 695,494 685,522 455,522" fill="#d1fae5" stroke="#1a7a44" stroke-width="1.5"/>
+  <text x="570" y="513" text-anchor="middle" font-size="9.5" fill="#111">set_content_provider(png_bytes)</text>
+  <line x1="570" y1="522" x2="570" y2="542" stroke="#333" stroke-width="1.5" marker-end="url(#a1)"/>
+
+  <!-- END -->
+  <rect x="445" y="542" width="250" height="34" rx="17" fill="#7c3aed"/>
+  <text x="570" y="564" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">Encrypted PNG → Frontend</text>
+
+  <!-- Connecting arrow between the two halves -->
+  <line x1="372" y1="500" x2="443" y2="500" stroke="#9333ea" stroke-width="2.5" marker-end="url(#a3)" stroke-dasharray="6,4"/>
+  <text x="407" y="494" text-anchor="middle" font-size="8.5" fill="#7c3aed" font-weight="600">encrypted</text>
+  <text x="407" y="506" text-anchor="middle" font-size="8.5" fill="#7c3aed" font-weight="600">stream</text>
+</svg>
+</div>
+<p class="fc-caption">Figure 2: Left — pixel extraction into RGB byte stream. Right — reconstruction of encrypted pixel buffer into PNG.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     FC-3  CAESAR CIPHER
+     ══════════════════════════════════════════════════ -->
+<div class="fc-section">
+<div class="fc-title">Figure 3 — Caesar Cipher (Additive Shift) · Encrypt &amp; Decrypt</div>
+<div class="fc-grid2">
+
+<!-- ENCRYPT -->
+<div>
+<div class="fc-wrap">
+<svg width="340" height="460" viewBox="0 0 340 460" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="ca" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#333"/></marker></defs>
+  <text x="170" y="20" text-anchor="middle" font-size="10" font-weight="700" fill="#1a2a6c">ENCRYPTION</text>
+
+  <rect x="60" y="32" width="220" height="32" rx="16" fill="#1a2a6c"/>
+  <text x="170" y="53" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">START</text>
+  <line x1="170" y1="64" x2="170" y2="84" stroke="#333" stroke-width="1.5" marker-end="url(#ca)"/>
+
+  <polygon points="60,84 280,84 270,110 70,110" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="170" y="102" text-anchor="middle" font-size="9.5" fill="#111">Input: byte P ∈ [0, 255]</text>
+  <line x1="170" y1="110" x2="170" y2="130" stroke="#333" stroke-width="1.5" marker-end="url(#ca)"/>
+
+  <rect x="60" y="130" width="220" height="34" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="170" y="149" text-anchor="middle" font-size="9.5" fill="#111">Read encryption key k</text>
+  <text x="170" y="161" text-anchor="middle" font-size="8" fill="#555" class="mono">k ∈ {0 … 255}</text>
+  <line x1="170" y1="164" x2="170" y2="184" stroke="#333" stroke-width="1.5" marker-end="url(#ca)"/>
+
+  <rect x="60" y="184" width="220" height="46" rx="4" fill="#dbeafe" stroke="#1a5cbb" stroke-width="1.5"/>
+  <text x="170" y="202" text-anchor="middle" font-size="9.5" fill="#111" font-weight="500">Compute ciphertext byte</text>
+  <text x="170" y="218" text-anchor="middle" font-size="11" fill="#1a2a6c" font-style="italic">C = (P + k) &amp; 0xFF</text>
+  <text x="170" y="228" text-anchor="middle" font-size="8" fill="#666">≡ (P + k) mod 256</text>
+  <line x1="170" y1="230" x2="170" y2="250" stroke="#333" stroke-width="1.5" marker-end="url(#ca)"/>
+
+  <polygon points="170,250 290,274 170,298 50,274" fill="#fff9e6" stroke="#cc8800" stroke-width="1.5"/>
+  <text x="170" y="278" text-anchor="middle" font-size="9" fill="#111">More bytes?</text>
+  <line x1="50" y1="274" x2="20" y2="274" stroke="#cc8800" stroke-width="1.5"/>
+  <line x1="20" y1="274" x2="20" y2="147" stroke="#cc8800" stroke-width="1.5"/>
+  <line x1="20" y1="147" x2="59" y2="147" stroke="#cc8800" stroke-width="1.5" marker-end="url(#ca)"/>
+  <text x="12" y="216" text-anchor="middle" font-size="8" fill="#cc8800" transform="rotate(-90,12,216)">YES</text>
+  <line x1="170" y1="298" x2="170" y2="318" stroke="#1a7a44" stroke-width="1.5" marker-end="url(#ca)"/>
+  <text x="180" y="312" font-size="8" fill="#1a7a44">NO</text>
+
+  <polygon points="60,318 280,318 270,344 70,344" fill="#d1fae5" stroke="#1a7a44" stroke-width="1.5"/>
+  <text x="170" y="336" text-anchor="middle" font-size="9.5" fill="#111">Output encrypted byte stream</text>
+  <line x1="170" y1="344" x2="170" y2="364" stroke="#333" stroke-width="1.5" marker-end="url(#ca)"/>
+
+  <!-- Example box -->
+  <rect x="40" y="364" width="260" height="58" rx="4" fill="#f0f4ff" stroke="#6b82dd" stroke-width="1"/>
+  <text x="170" y="380" text-anchor="middle" font-size="8.5" fill="#1a2a6c" font-weight="600">Worked Example  (k = 7)</text>
+  <text x="60" y="396" font-size="8.5" fill="#cc2222" class="mono">R: (120 + 7) &amp; 0xFF = 127</text>
+  <text x="60" y="410" font-size="8.5" fill="#228822" class="mono">G: ( 64 + 7) &amp; 0xFF =  71</text>
+  <text x="60" y="424" font-size="8.5" fill="#2255cc" class="mono">B: (200 + 7) &amp; 0xFF = 207</text>
+  <line x1="170" y1="422" x2="170" y2="442" stroke="#333" stroke-width="1.5" marker-end="url(#ca)"/>
+
+  <rect x="60" y="440" width="220" height="18" rx="9" fill="#1a2a6c"/>
+  <text x="170" y="453" text-anchor="middle" font-size="9" fill="#fff">END</text>
+</svg>
+</div>
+</div>
+
+<!-- DECRYPT -->
+<div>
+<div class="fc-wrap">
+<svg width="340" height="460" viewBox="0 0 340 460" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="cd" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#333"/></marker></defs>
+  <text x="170" y="20" text-anchor="middle" font-size="10" font-weight="700" fill="#7c3aed">DECRYPTION</text>
+
+  <rect x="60" y="32" width="220" height="32" rx="16" fill="#7c3aed"/>
+  <text x="170" y="53" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">START</text>
+  <line x1="170" y1="64" x2="170" y2="84" stroke="#333" stroke-width="1.5" marker-end="url(#cd)"/>
+
+  <polygon points="60,84 280,84 270,110 70,110" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="170" y="102" text-anchor="middle" font-size="9.5" fill="#111">Input: cipher byte C ∈ [0, 255]</text>
+  <line x1="170" y1="110" x2="170" y2="130" stroke="#333" stroke-width="1.5" marker-end="url(#cd)"/>
+
+  <rect x="60" y="130" width="220" height="34" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="170" y="149" text-anchor="middle" font-size="9.5" fill="#111">Read same key k</text>
+  <text x="170" y="161" text-anchor="middle" font-size="8" fill="#555">Identical key used for both directions</text>
+  <line x1="170" y1="164" x2="170" y2="184" stroke="#333" stroke-width="1.5" marker-end="url(#cd)"/>
+
+  <rect x="60" y="184" width="220" height="46" rx="4" fill="#fce7f3" stroke="#9333ea" stroke-width="1.5"/>
+  <text x="170" y="202" text-anchor="middle" font-size="9.5" fill="#111" font-weight="500">Compute plaintext byte</text>
+  <text x="170" y="218" text-anchor="middle" font-size="11" fill="#7c3aed" font-style="italic">P = (C − k) &amp; 0xFF</text>
+  <text x="170" y="228" text-anchor="middle" font-size="8" fill="#666">≡ (C − k + 256) mod 256</text>
+  <line x1="170" y1="230" x2="170" y2="250" stroke="#333" stroke-width="1.5" marker-end="url(#cd)"/>
+
+  <polygon points="170,250 290,274 170,298 50,274" fill="#fff9e6" stroke="#cc8800" stroke-width="1.5"/>
+  <text x="170" y="278" text-anchor="middle" font-size="9" fill="#111">More bytes?</text>
+  <line x1="50" y1="274" x2="20" y2="274" stroke="#cc8800" stroke-width="1.5"/>
+  <line x1="20" y1="274" x2="20" y2="147" stroke="#cc8800" stroke-width="1.5"/>
+  <line x1="20" y1="147" x2="59" y2="147" stroke="#cc8800" stroke-width="1.5" marker-end="url(#cd)"/>
+  <text x="12" y="216" text-anchor="middle" font-size="8" fill="#cc8800" transform="rotate(-90,12,216)">YES</text>
+  <line x1="170" y1="298" x2="170" y2="318" stroke="#1a7a44" stroke-width="1.5" marker-end="url(#cd)"/>
+  <text x="180" y="312" font-size="8" fill="#1a7a44">NO</text>
+
+  <polygon points="60,318 280,318 270,344 70,344" fill="#d1fae5" stroke="#1a7a44" stroke-width="1.5"/>
+  <text x="170" y="336" text-anchor="middle" font-size="9.5" fill="#111">Output restored plaintext stream</text>
+  <line x1="170" y1="344" x2="170" y2="364" stroke="#333" stroke-width="1.5" marker-end="url(#cd)"/>
+
+  <rect x="40" y="364" width="260" height="58" rx="4" fill="#f5f0ff" stroke="#9333ea" stroke-width="1"/>
+  <text x="170" y="380" text-anchor="middle" font-size="8.5" fill="#7c3aed" font-weight="600">Worked Example  (k = 7)</text>
+  <text x="60" y="396" font-size="8.5" fill="#cc2222" class="mono">R: (127 − 7) &amp; 0xFF = 120</text>
+  <text x="60" y="410" font-size="8.5" fill="#228822" class="mono">G: ( 71 − 7) &amp; 0xFF =  64</text>
+  <text x="60" y="424" font-size="8.5" fill="#2255cc" class="mono">B: (207 − 7) &amp; 0xFF = 200</text>
+  <line x1="170" y1="422" x2="170" y2="442" stroke="#333" stroke-width="1.5" marker-end="url(#cd)"/>
+
+  <rect x="60" y="440" width="220" height="18" rx="9" fill="#7c3aed"/>
+  <text x="170" y="453" text-anchor="middle" font-size="9" fill="#fff">END — original restored ✓</text>
+</svg>
+</div>
+</div>
+</div>
+<p class="fc-caption">Figure 3: Caesar cipher encrypt (left) and decrypt (right). Encryption adds k mod 256; decryption subtracts k mod 256.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     FC-4  MULTIPLICATIVE & AFFINE
+     ══════════════════════════════════════════════════ -->
+<div class="fc-section">
+<div class="fc-title">Figure 4 — Multiplicative Cipher &amp; Affine Cipher Flowcharts</div>
+<div class="fc-grid2">
+
+<!-- MULTIPLICATIVE -->
+<div>
+<div class="fc-wrap">
+<svg width="340" height="520" viewBox="0 0 340 520" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="ma" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#333"/></marker></defs>
+  <text x="170" y="18" text-anchor="middle" font-size="10" font-weight="700" fill="#1a2a6c">MULTIPLICATIVE CIPHER</text>
+
+  <rect x="60" y="28" width="220" height="30" rx="15" fill="#1a2a6c"/>
+  <text x="170" y="48" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">START</text>
+  <line x1="170" y1="58" x2="170" y2="76" stroke="#333" stroke-width="1.5" marker-end="url(#ma)"/>
+
+  <rect x="60" y="76" width="220" height="34" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="170" y="91" text-anchor="middle" font-size="9.5" fill="#111">Input key a ∈ ℤ</text>
+  <text x="170" y="103" text-anchor="middle" font-size="8.5" fill="#555" class="mono">Must satisfy gcd(a, 256) = 1</text>
+  <line x1="170" y1="110" x2="170" y2="128" stroke="#333" stroke-width="1.5" marker-end="url(#ma)"/>
+
+  <!-- Validate -->
+  <polygon points="170,128 300,152 170,176 40,152" fill="#fff9e6" stroke="#cc8800" stroke-width="1.5"/>
+  <text x="170" y="148" text-anchor="middle" font-size="9" fill="#111">isCoprime</text>
+  <text x="170" y="160" text-anchor="middle" font-size="9" fill="#111">(a, 256)?</text>
+  <line x1="300" y1="152" x2="325" y2="152" stroke="#cc0000" stroke-width="1.5"/>
+  <line x1="325" y1="152" x2="325" y2="200" stroke="#cc0000" stroke-width="1.5"/>
+  <text x="325" y="178" text-anchor="middle" font-size="8" fill="#cc0000">NO → 400</text>
+  <line x1="170" y1="176" x2="170" y2="196" stroke="#1a7a44" stroke-width="1.5" marker-end="url(#ma)"/>
+  <text x="180" y="190" font-size="8" fill="#1a7a44">YES</text>
+
+  <!-- Compute inverse for decrypt -->
+  <rect x="60" y="196" width="220" height="36" rx="4" fill="#dbeafe" stroke="#1a5cbb" stroke-width="1.5"/>
+  <text x="170" y="211" text-anchor="middle" font-size="9.5" fill="#111">Compute a⁻¹ mod 256</text>
+  <text x="170" y="224" text-anchor="middle" font-size="8.5" fill="#555" class="mono">extGCD(a, 256) → a⁻¹</text>
+  <line x1="170" y1="232" x2="170" y2="252" stroke="#333" stroke-width="1.5" marker-end="url(#ma)"/>
+
+  <!-- Encrypt box -->
+  <rect x="60" y="252" width="220" height="44" rx="4" fill="#dbeafe" stroke="#1a5cbb" stroke-width="1.5"/>
+  <text x="170" y="268" text-anchor="middle" font-size="9" fill="#111" font-weight="500">ENCRYPT each byte P:</text>
+  <text x="170" y="282" text-anchor="middle" font-size="11" fill="#1a2a6c" font-style="italic">C = (a × P) &amp; 0xFF</text>
+  <text x="170" y="293" text-anchor="middle" font-size="8" fill="#666">mod 256 via bitwise AND</text>
+  <line x1="170" y1="296" x2="170" y2="316" stroke="#333" stroke-width="1.5" marker-end="url(#ma)"/>
+
+  <!-- Decrypt box -->
+  <rect x="60" y="316" width="220" height="44" rx="4" fill="#fce7f3" stroke="#9333ea" stroke-width="1.5"/>
+  <text x="170" y="332" text-anchor="middle" font-size="9" fill="#111" font-weight="500">DECRYPT each byte C:</text>
+  <text x="170" y="346" text-anchor="middle" font-size="11" fill="#7c3aed" font-style="italic">P = (a⁻¹ × C) &amp; 0xFF</text>
+  <text x="170" y="357" text-anchor="middle" font-size="8" fill="#666">Uses precomputed inverse</text>
+  <line x1="170" y1="360" x2="170" y2="380" stroke="#333" stroke-width="1.5" marker-end="url(#ma)"/>
+
+  <!-- Example -->
+  <rect x="40" y="380" width="260" height="64" rx="4" fill="#f0f4ff" stroke="#6b82dd" stroke-width="1"/>
+  <text x="170" y="396" text-anchor="middle" font-size="8.5" fill="#1a2a6c" font-weight="600">Example  a=5,  a⁻¹=205</text>
+  <text x="55" y="412" font-size="8.5" fill="#1a2a6c" class="mono">ENC: (5×120) mod 256 = 88</text>
+  <text x="55" y="426" font-size="8.5" fill="#7c3aed" class="mono">DEC: (205×88) mod 256 = 120 ✓</text>
+  <text x="55" y="438" font-size="8" fill="#888">5 × 205 = 1025 ≡ 1 (mod 256)</text>
+  <line x1="170" y1="444" x2="170" y2="460" stroke="#333" stroke-width="1.5" marker-end="url(#ma)"/>
+
+  <rect x="60" y="460" width="220" height="20" rx="10" fill="#1a2a6c"/>
+  <text x="170" y="474" text-anchor="middle" font-size="9" fill="#fff">END</text>
+</svg>
+</div>
+</div>
+
+<!-- AFFINE -->
+<div>
+<div class="fc-wrap">
+<svg width="340" height="520" viewBox="0 0 340 520" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="af" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#333"/></marker></defs>
+  <text x="170" y="18" text-anchor="middle" font-size="10" font-weight="700" fill="#1a2a6c">AFFINE CIPHER</text>
+
+  <rect x="60" y="28" width="220" height="30" rx="15" fill="#1a2a6c"/>
+  <text x="170" y="48" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">START</text>
+  <line x1="170" y1="58" x2="170" y2="76" stroke="#333" stroke-width="1.5" marker-end="url(#af)"/>
+
+  <rect x="60" y="76" width="220" height="34" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="170" y="91" text-anchor="middle" font-size="9.5" fill="#111">Input keys: a, b</text>
+  <text x="170" y="103" text-anchor="middle" font-size="8.5" fill="#555" class="mono">format: "a,b"  e.g. "5,8"</text>
+  <line x1="170" y1="110" x2="170" y2="128" stroke="#333" stroke-width="1.5" marker-end="url(#af)"/>
+
+  <polygon points="170,128 300,152 170,176 40,152" fill="#fff9e6" stroke="#cc8800" stroke-width="1.5"/>
+  <text x="170" y="148" text-anchor="middle" font-size="9" fill="#111">gcd(a,256)</text>
+  <text x="170" y="160" text-anchor="middle" font-size="9" fill="#111">= 1 ?</text>
+  <line x1="300" y1="152" x2="325" y2="152" stroke="#cc0000" stroke-width="1.5"/>
+  <line x1="325" y1="152" x2="325" y2="200" stroke="#cc0000" stroke-width="1.5"/>
+  <text x="325" y="178" text-anchor="middle" font-size="8" fill="#cc0000">NO → 400</text>
+  <line x1="170" y1="176" x2="170" y2="196" stroke="#1a7a44" stroke-width="1.5" marker-end="url(#af)"/>
+  <text x="180" y="190" font-size="8" fill="#1a7a44">YES</text>
+
+  <rect x="60" y="196" width="220" height="36" rx="4" fill="#dbeafe" stroke="#1a5cbb" stroke-width="1.5"/>
+  <text x="170" y="211" text-anchor="middle" font-size="9.5" fill="#111">Compute a⁻¹ mod 256</text>
+  <text x="170" y="224" text-anchor="middle" font-size="8.5" fill="#555" class="mono">ModularArithmetic::modInverse(a,256)</text>
+  <line x1="170" y1="232" x2="170" y2="252" stroke="#333" stroke-width="1.5" marker-end="url(#af)"/>
+
+  <rect x="60" y="252" width="220" height="46" rx="4" fill="#dbeafe" stroke="#1a5cbb" stroke-width="1.5"/>
+  <text x="170" y="268" text-anchor="middle" font-size="9" fill="#111" font-weight="500">ENCRYPT each byte P:</text>
+  <text x="170" y="283" text-anchor="middle" font-size="11" fill="#1a2a6c" font-style="italic">C = (a×P + b) &amp; 0xFF</text>
+  <text x="170" y="294" text-anchor="middle" font-size="8" fill="#666">linear substitution mod 256</text>
+  <line x1="170" y1="298" x2="170" y2="318" stroke="#333" stroke-width="1.5" marker-end="url(#af)"/>
+
+  <rect x="60" y="318" width="220" height="46" rx="4" fill="#fce7f3" stroke="#9333ea" stroke-width="1.5"/>
+  <text x="170" y="334" text-anchor="middle" font-size="9" fill="#111" font-weight="500">DECRYPT each byte C:</text>
+  <text x="170" y="349" text-anchor="middle" font-size="11" fill="#7c3aed" font-style="italic">P = a⁻¹×(C−b) &amp; 0xFF</text>
+  <text x="170" y="360" text-anchor="middle" font-size="8" fill="#666">subtract additive component first</text>
+  <line x1="170" y1="364" x2="170" y2="382" stroke="#333" stroke-width="1.5" marker-end="url(#af)"/>
+
+  <rect x="40" y="382" width="260" height="64" rx="4" fill="#f0f4ff" stroke="#6b82dd" stroke-width="1"/>
+  <text x="170" y="398" text-anchor="middle" font-size="8.5" fill="#1a2a6c" font-weight="600">Example  a=5, b=8, a⁻¹=205</text>
+  <text x="55" y="414" font-size="8.5" fill="#1a2a6c" class="mono">ENC: (5×120+8) mod 256 = 96</text>
+  <text x="55" y="428" font-size="8.5" fill="#7c3aed" class="mono">DEC: 205×(96−8) mod 256 = 120 ✓</text>
+  <text x="55" y="440" font-size="8" fill="#888">Generalises Caesar (a=1) and Mult (b=0)</text>
+  <line x1="170" y1="446" x2="170" y2="462" stroke="#333" stroke-width="1.5" marker-end="url(#af)"/>
+
+  <rect x="60" y="462" width="220" height="20" rx="10" fill="#1a2a6c"/>
+  <text x="170" y="476" text-anchor="middle" font-size="9" fill="#fff">END</text>
+</svg>
+</div>
+</div>
+
+</div>
+<p class="fc-caption">Figure 4: Multiplicative cipher (left) and Affine cipher (right). Both require key validation via gcd before processing.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     FC-5  HILL CIPHER
+     ══════════════════════════════════════════════════ -->
+<div class="fc-section">
+<div class="fc-title">Figure 5 — Hill Cipher (Matrix-Based Block Cipher)</div>
+<div class="fc-subtitle">n×n matrix multiplication mod 256 on blocks of n RGB bytes. Supports n=2 and n=3.</div>
+<div class="fc-wrap">
+<svg width="760" height="560" viewBox="0 0 760 560" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="hi" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#333"/></marker>
+    <marker id="hiR" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#cc0000"/></marker>
+  </defs>
+
+  <!-- START -->
+  <rect x="280" y="10" width="200" height="32" rx="16" fill="#1a2a6c"/>
+  <text x="380" y="31" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">START</text>
+  <line x1="380" y1="42" x2="380" y2="60" stroke="#333" stroke-width="1.5" marker-end="url(#hi)"/>
+
+  <!-- Parse Key -->
+  <polygon points="200,60 560,60 550,88 210,88" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="380" y="79" text-anchor="middle" font-size="9.5" fill="#111">Parse key matrix K (n×n comma-separated integers) + param n</text>
+  <line x1="380" y1="88" x2="380" y2="108" stroke="#333" stroke-width="1.5" marker-end="url(#hi)"/>
+
+  <!-- Validate n -->
+  <polygon points="380,108 520,132 380,156 240,132" fill="#fff9e6" stroke="#cc8800" stroke-width="1.5"/>
+  <text x="380" y="128" text-anchor="middle" font-size="9" fill="#111">n = 2 or 3?</text>
+  <text x="380" y="140" text-anchor="middle" font-size="8" fill="#666">valid range check</text>
+  <!-- NO -->
+  <line x1="520" y1="132" x2="580" y2="132" stroke="#cc0000" stroke-width="1.5" marker-end="url(#hiR)"/>
+  <rect x="582" y="122" width="150" height="20" rx="4" fill="#fee2e2" stroke="#cc0000" stroke-width="1"/>
+  <text x="657" y="135" text-anchor="middle" font-size="8.5" fill="#cc0000">HTTP 400: invalid param</text>
+  <!-- YES -->
+  <line x1="380" y1="156" x2="380" y2="176" stroke="#1a7a44" stroke-width="1.5" marker-end="url(#hi)"/>
+  <text x="390" y="170" font-size="8" fill="#1a7a44">YES</text>
+
+  <!-- Compute determinant -->
+  <rect x="200" y="176" width="360" height="36" rx="4" fill="#dbeafe" stroke="#1a5cbb" stroke-width="1.5"/>
+  <text x="380" y="191" text-anchor="middle" font-size="9.5" fill="#111">Compute det(K) mod 256</text>
+  <text x="380" y="204" text-anchor="middle" font-size="8.5" fill="#555" class="mono">MatrixOperations::determinant(K, n, 256)</text>
+  <line x1="380" y1="212" x2="380" y2="232" stroke="#333" stroke-width="1.5" marker-end="url(#hi)"/>
+
+  <!-- Invertible check -->
+  <polygon points="380,232 530,258 380,284 230,258" fill="#fff9e6" stroke="#cc8800" stroke-width="1.5"/>
+  <text x="380" y="254" text-anchor="middle" font-size="9" fill="#111">gcd(det(K),256)</text>
+  <text x="380" y="266" text-anchor="middle" font-size="9" fill="#111">= 1 ?</text>
+  <!-- NO -->
+  <line x1="530" y1="258" x2="580" y2="258" stroke="#cc0000" stroke-width="1.5" marker-end="url(#hiR)"/>
+  <rect x="582" y="248" width="150" height="20" rx="4" fill="#fee2e2" stroke="#cc0000" stroke-width="1"/>
+  <text x="657" y="261" text-anchor="middle" font-size="8.5" fill="#cc0000">HTTP 400: not invertible</text>
+  <!-- YES -->
+  <line x1="380" y1="284" x2="380" y2="304" stroke="#1a7a44" stroke-width="1.5" marker-end="url(#hi)"/>
+  <text x="390" y="298" font-size="8" fill="#1a7a44">YES</text>
+
+  <!-- Compute K inverse -->
+  <rect x="200" y="304" width="360" height="46" rx="4" fill="#dbeafe" stroke="#1a5cbb" stroke-width="1.5"/>
+  <text x="380" y="319" text-anchor="middle" font-size="9.5" fill="#111">Compute K⁻¹ mod 256</text>
+  <text x="380" y="332" text-anchor="middle" font-size="8.5" fill="#555" class="mono">K⁻¹ = det⁻¹ × adj(K)  mod 256</text>
+  <text x="380" y="344" text-anchor="middle" font-size="8" fill="#888">MatrixOperations::inverse(K, n, 256)</text>
+  <line x1="380" y1="350" x2="380" y2="368" stroke="#333" stroke-width="1.5" marker-end="url(#hi)"/>
+
+  <!-- Two paths: Encrypt / Decrypt -->
+  <polygon points="380,368 490,388 380,408 270,388" fill="#f3f0ff" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="380" y="384" text-anchor="middle" font-size="9" fill="#111">Mode?</text>
+  <text x="380" y="396" text-anchor="middle" font-size="8" fill="#666">encrypt / decrypt</text>
+
+  <!-- Encrypt branch -->
+  <line x1="270" y1="388" x2="130" y2="388" stroke="#1a5cbb" stroke-width="1.5" marker-end="url(#hi)"/>
+  <text x="200" y="382" text-anchor="middle" font-size="8" fill="#1a5cbb">ENCRYPT</text>
+  <rect x="30" y="408" width="200" height="60" rx="4" fill="#dbeafe" stroke="#1a5cbb" stroke-width="1.5"/>
+  <text x="130" y="424" text-anchor="middle" font-size="9" fill="#111" font-weight="500">For each block b of n bytes:</text>
+  <text x="130" y="438" text-anchor="middle" font-size="10.5" fill="#1a2a6c" font-style="italic">C = K · b mod 256</text>
+  <text x="130" y="452" text-anchor="middle" font-size="8" fill="#555" class="mono">MatrixOps::multiply(K, block)</text>
+  <text x="130" y="464" text-anchor="middle" font-size="8" fill="#888">n bytes in → n bytes out</text>
+
+  <!-- Decrypt branch -->
+  <line x1="490" y1="388" x2="630" y2="388" stroke="#9333ea" stroke-width="1.5" marker-end="url(#hi)"/>
+  <text x="560" y="382" text-anchor="middle" font-size="8" fill="#9333ea">DECRYPT</text>
+  <rect x="530" y="408" width="200" height="60" rx="4" fill="#fce7f3" stroke="#9333ea" stroke-width="1.5"/>
+  <text x="630" y="424" text-anchor="middle" font-size="9" fill="#111" font-weight="500">For each block b of n bytes:</text>
+  <text x="630" y="438" text-anchor="middle" font-size="10.5" fill="#7c3aed" font-style="italic">P = K⁻¹ · b mod 256</text>
+  <text x="630" y="452" text-anchor="middle" font-size="8" fill="#555" class="mono">MatrixOps::multiply(K⁻¹, block)</text>
+  <text x="630" y="464" text-anchor="middle" font-size="8" fill="#888">uses precomputed inverse</text>
+
+  <!-- Join -->
+  <line x1="130" y1="468" x2="130" y2="500" stroke="#333" stroke-width="1.5"/>
+  <line x1="130" y1="500" x2="380" y2="500" stroke="#333" stroke-width="1.5"/>
+  <line x1="630" y1="468" x2="630" y2="500" stroke="#333" stroke-width="1.5"/>
+  <line x1="630" y1="500" x2="380" y2="500" stroke="#333" stroke-width="1.5"/>
+  <line x1="380" y1="500" x2="380" y2="520" stroke="#333" stroke-width="1.5" marker-end="url(#hi)"/>
+
+  <!-- Note -->
+  <rect x="220" y="520" width="320" height="18" rx="4" fill="#f9f9f9" stroke="#aaa" stroke-width="1"/>
+  <text x="380" y="532" text-anchor="middle" font-size="8" fill="#555">Pad stream to multiple of n if needed · strip padding after decrypt</text>
+
+  <!-- END -->
+  <rect x="300" y="540" width="160" height="18" rx="9" fill="#1a2a6c"/>
+  <text x="380" y="553" text-anchor="middle" font-size="9" fill="#fff">END</text>
+</svg>
+</div>
+<p class="fc-caption">Figure 5: Hill cipher flowchart. Key validation (determinant coprime to 256) occurs before any encryption. Matrix inverse computed once; reused for all blocks.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     FC-6  PLAYFAIR CIPHER
+     ══════════════════════════════════════════════════ -->
+<div class="fc-section">
+<div class="fc-title">Figure 6 — Playfair Cipher (16×16 Extended Digraph Substitution)</div>
+<div class="fc-wrap">
+<svg width="760" height="600" viewBox="0 0 760 600" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="pf" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#333"/></marker></defs>
+
+  <!-- START -->
+  <rect x="280" y="8" width="200" height="30" rx="15" fill="#1a2a6c"/>
+  <text x="380" y="28" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">START: key string received</text>
+  <line x1="380" y1="38" x2="380" y2="56" stroke="#333" stroke-width="1.5" marker-end="url(#pf)"/>
+
+  <!-- Build key square -->
+  <rect x="180" y="56" width="400" height="54" rx="4" fill="#dbeafe" stroke="#1a5cbb" stroke-width="1.5"/>
+  <text x="380" y="72" text-anchor="middle" font-size="9.5" fill="#111" font-weight="500">Build 16×16 Substitution Square</text>
+  <text x="380" y="86" text-anchor="middle" font-size="8.5" fill="#555">1. Insert key bytes (no duplicates)</text>
+  <text x="380" y="98" text-anchor="middle" font-size="8.5" fill="#555">2. Fill remaining 256 positions with unused bytes 0–255</text>
+  <line x1="380" y1="110" x2="380" y2="128" stroke="#333" stroke-width="1.5" marker-end="url(#pf)"/>
+
+  <!-- Build lookup -->
+  <rect x="180" y="128" width="400" height="36" rx="4" fill="#dbeafe" stroke="#1a5cbb" stroke-width="1.5"/>
+  <text x="380" y="143" text-anchor="middle" font-size="9.5" fill="#111">Build row/col lookup tables</text>
+  <text x="380" y="157" text-anchor="middle" font-size="8.5" fill="#555" class="mono">rowPos[byte], colPos[byte] → position in 16×16 grid</text>
+  <line x1="380" y1="164" x2="380" y2="182" stroke="#333" stroke-width="1.5" marker-end="url(#pf)"/>
+
+  <!-- Pad if odd -->
+  <polygon points="380,182 500,200 380,218 260,200" fill="#fff9e6" stroke="#cc8800" stroke-width="1.5"/>
+  <text x="380" y="196" text-anchor="middle" font-size="9" fill="#111">Stream length</text>
+  <text x="380" y="208" text-anchor="middle" font-size="9" fill="#111">odd?</text>
+  <line x1="500" y1="200" x2="580" y2="200" stroke="#cc8800" stroke-width="1.5"/>
+  <rect x="582" y="190" width="148" height="20" rx="3" fill="#fff9e6" stroke="#cc8800" stroke-width="1"/>
+  <text x="656" y="203" text-anchor="middle" font-size="8.5" fill="#8a5f00">YES → append 0x00 byte</text>
+  <line x1="380" y1="218" x2="380" y2="238" stroke="#333" stroke-width="1.5" marker-end="url(#pf)"/>
+  <text x="390" y="232" font-size="8" fill="#333">NO / after pad</text>
+
+  <!-- Process pairs loop -->
+  <rect x="180" y="238" width="400" height="28" rx="4" fill="#fef3c7" stroke="#cc8800" stroke-width="1.5"/>
+  <text x="380" y="258" text-anchor="middle" font-size="9.5" fill="#111">Process byte pairs: for i = 0 to len−1 step 2</text>
+  <line x1="380" y1="266" x2="380" y2="284" stroke="#333" stroke-width="1.5" marker-end="url(#pf)"/>
+
+  <!-- Read pair -->
+  <rect x="180" y="284" width="400" height="28" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="380" y="303" text-anchor="middle" font-size="9.5" fill="#111">Read pair (P₁, P₂) → lookup (r₁,c₁) and (r₂,c₂)</text>
+  <line x1="380" y1="312" x2="380" y2="330" stroke="#333" stroke-width="1.5" marker-end="url(#pf)"/>
+
+  <!-- Three-way decision -->
+  <polygon points="380,330 500,354 380,378 260,354" fill="#fff9e6" stroke="#cc8800" stroke-width="1.5"/>
+  <text x="380" y="350" text-anchor="middle" font-size="9" fill="#111">Position</text>
+  <text x="380" y="362" text-anchor="middle" font-size="9" fill="#111">relationship?</text>
+
+  <!-- Rule 1: Same row -->
+  <line x1="260" y1="354" x2="80" y2="354" stroke="#1a5cbb" stroke-width="1.5" marker-end="url(#pf)"/>
+  <text x="170" y="348" text-anchor="middle" font-size="8" fill="#1a5cbb">r₁=r₂ (same row)</text>
+  <rect x="10" y="368" width="160" height="52" rx="4" fill="#dbeafe" stroke="#1a5cbb" stroke-width="1.5"/>
+  <text x="90" y="382" text-anchor="middle" font-size="9" fill="#111" font-weight="500">ROW RULE</text>
+  <text x="90" y="396" text-anchor="middle" font-size="8.5" fill="#111">ENC: shift col +1 mod 16</text>
+  <text x="90" y="408" text-anchor="middle" font-size="8.5" fill="#555">DEC: shift col −1 mod 16</text>
+  <text x="90" y="418" text-anchor="middle" font-size="8" fill="#888" class="mono">(col+1)%16 / (col+15)%16</text>
+
+  <!-- Rule 2: Same col -->
+  <line x1="380" y1="378" x2="380" y2="396" stroke="#1a7a44" stroke-width="1.5" marker-end="url(#pf)"/>
+  <text x="390" y="392" font-size="8" fill="#1a7a44">c₁=c₂</text>
+  <rect x="300" y="396" width="160" height="52" rx="4" fill="#d1fae5" stroke="#1a7a44" stroke-width="1.5"/>
+  <text x="380" y="410" text-anchor="middle" font-size="9" fill="#111" font-weight="500">COLUMN RULE</text>
+  <text x="380" y="424" text-anchor="middle" font-size="8.5" fill="#111">ENC: shift row +1 mod 16</text>
+  <text x="380" y="436" text-anchor="middle" font-size="8.5" fill="#555">DEC: shift row −1 mod 16</text>
+  <text x="380" y="448" text-anchor="middle" font-size="8" fill="#888" class="mono">(row+1)%16 / (row+15)%16</text>
+
+  <!-- Rule 3: Rectangle -->
+  <line x1="500" y1="354" x2="680" y2="354" stroke="#9333ea" stroke-width="1.5" marker-end="url(#pf)"/>
+  <text x="590" y="348" text-anchor="middle" font-size="8" fill="#9333ea">otherwise (rectangle)</text>
+  <rect x="590" y="368" width="160" height="52" rx="4" fill="#fce7f3" stroke="#9333ea" stroke-width="1.5"/>
+  <text x="670" y="382" text-anchor="middle" font-size="9" fill="#111" font-weight="500">RECTANGLE RULE</text>
+  <text x="670" y="396" text-anchor="middle" font-size="8.5" fill="#111">Swap columns:</text>
+  <text x="670" y="408" text-anchor="middle" font-size="8.5" fill="#555">C₁ = square[r₁][c₂]</text>
+  <text x="670" y="420" text-anchor="middle" font-size="8.5" fill="#555">C₂ = square[r₂][c₁]</text>
+  <text x="670" y="432" text-anchor="middle" font-size="8" fill="#888">self-inverse rule</text>
+
+  <!-- Join all three -->
+  <line x1="90" y1="420" x2="90" y2="480" stroke="#333" stroke-width="1.5"/>
+  <line x1="90" y1="480" x2="380" y2="480" stroke="#333" stroke-width="1.5"/>
+  <line x1="670" y1="420" x2="670" y2="480" stroke="#333" stroke-width="1.5"/>
+  <line x1="670" y1="480" x2="380" y2="480" stroke="#333" stroke-width="1.5"/>
+  <line x1="380" y1="448" x2="380" y2="480" stroke="#333" stroke-width="1.5"/>
+  <line x1="380" y1="480" x2="380" y2="498" stroke="#333" stroke-width="1.5" marker-end="url(#pf)"/>
+
+  <!-- Loop back -->
+  <polygon points="380,498 470,516 380,534 290,516" fill="#fff9e6" stroke="#cc8800" stroke-width="1.5"/>
+  <text x="380" y="520" text-anchor="middle" font-size="9" fill="#111">More pairs?</text>
+  <line x1="470" y1="516" x2="740" y2="516" stroke="#cc8800" stroke-width="1.5"/>
+  <line x1="740" y1="516" x2="740" y2="252" stroke="#cc8800" stroke-width="1.5"/>
+  <line x1="740" y1="252" x2="581" y2="252" stroke="#cc8800" stroke-width="1.5" marker-end="url(#pf)"/>
+  <text x="748" y="390" text-anchor="middle" font-size="8" fill="#cc8800" transform="rotate(-90,748,390)">YES (loop)</text>
+  <line x1="380" y1="534" x2="380" y2="554" stroke="#1a7a44" stroke-width="1.5" marker-end="url(#pf)"/>
+  <text x="390" y="548" font-size="8" fill="#1a7a44">NO</text>
+
+  <polygon points="200,554 560,554 550,578 210,578" fill="#d1fae5" stroke="#1a7a44" stroke-width="1.5"/>
+  <text x="380" y="571" text-anchor="middle" font-size="9.5" fill="#111">Output transformed byte stream → image reconstruction</text>
+</svg>
+</div>
+<p class="fc-caption">Figure 6: Playfair 16×16 cipher. The three positional rules are applied per byte pair. Rectangle rule is its own inverse; row/column rules shift direction reverses on decrypt.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     FC-7  RC4 STREAM CIPHER
+     ══════════════════════════════════════════════════ -->
+<div class="fc-section">
+<div class="fc-title">Figure 7 — RC4 Stream Cipher (KSA + PRGA)</div>
+<div class="fc-grid2">
+
+<!-- KSA -->
+<div>
+<div class="fc-wrap">
+<svg width="340" height="490" viewBox="0 0 340 490" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="ka" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#333"/></marker></defs>
+  <text x="170" y="18" text-anchor="middle" font-size="10" font-weight="700" fill="#1a2a6c">PHASE 1: KEY SCHEDULING (KSA)</text>
+
+  <rect x="55" y="28" width="230" height="30" rx="15" fill="#1a2a6c"/>
+  <text x="170" y="48" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">START: key string</text>
+  <line x1="170" y1="58" x2="170" y2="76" stroke="#333" stroke-width="1.5" marker-end="url(#ka)"/>
+
+  <rect x="55" y="76" width="230" height="36" rx="4" fill="#dbeafe" stroke="#1a5cbb" stroke-width="1.5"/>
+  <text x="170" y="91" text-anchor="middle" font-size="9.5" fill="#111">Identity initialise S-box</text>
+  <text x="170" y="104" text-anchor="middle" font-size="8.5" fill="#555" class="mono">S[i] = i   for i = 0..255</text>
+  <line x1="170" y1="112" x2="170" y2="130" stroke="#333" stroke-width="1.5" marker-end="url(#ka)"/>
+
+  <rect x="55" y="130" width="230" height="28" rx="4" fill="#fef3c7" stroke="#cc8800" stroke-width="1.5"/>
+  <text x="170" y="150" text-anchor="middle" font-size="9.5" fill="#111">j = 0,   for i = 0 to 255</text>
+  <line x1="170" y1="158" x2="170" y2="176" stroke="#333" stroke-width="1.5" marker-end="url(#ka)"/>
+
+  <rect x="55" y="176" width="230" height="46" rx="4" fill="#dbeafe" stroke="#1a5cbb" stroke-width="1.5"/>
+  <text x="170" y="192" text-anchor="middle" font-size="9" fill="#111" font-weight="500">Scramble S-box with key</text>
+  <text x="170" y="206" text-anchor="middle" font-size="8.5" fill="#111" class="mono">j = (j + S[i] + key[i mod len]) mod 256</text>
+  <text x="170" y="218" text-anchor="middle" font-size="8.5" fill="#555" class="mono">swap(S[i], S[j])</text>
+  <line x1="170" y1="222" x2="170" y2="240" stroke="#333" stroke-width="1.5" marker-end="url(#ka)"/>
+
+  <polygon points="170,240 285,260 170,280 55,260" fill="#fff9e6" stroke="#cc8800" stroke-width="1.5"/>
+  <text x="170" y="264" text-anchor="middle" font-size="9" fill="#111">i &lt; 256?</text>
+  <!-- YES loop -->
+  <line x1="55" y1="260" x2="20" y2="260" stroke="#cc8800" stroke-width="1.5"/>
+  <line x1="20" y1="260" x2="20" y2="144" stroke="#cc8800" stroke-width="1.5"/>
+  <line x1="20" y1="144" x2="54" y2="144" stroke="#cc8800" stroke-width="1.5" marker-end="url(#ka)"/>
+  <text x="12" y="206" text-anchor="middle" font-size="8" fill="#cc8800" transform="rotate(-90,12,206)">YES</text>
+  <!-- NO -->
+  <line x1="170" y1="280" x2="170" y2="298" stroke="#1a7a44" stroke-width="1.5" marker-end="url(#ka)"/>
+  <text x="180" y="293" font-size="8" fill="#1a7a44">NO</text>
+
+  <rect x="55" y="298" width="230" height="36" rx="4" fill="#d1fae5" stroke="#1a7a44" stroke-width="1.5"/>
+  <text x="170" y="313" text-anchor="middle" font-size="9.5" fill="#111">S-box fully initialised</text>
+  <text x="170" y="326" text-anchor="middle" font-size="8.5" fill="#555">256-byte pseudorandom permutation</text>
+  <line x1="170" y1="334" x2="170" y2="352" stroke="#333" stroke-width="1.5" marker-end="url(#ka)"/>
+
+  <!-- Note box -->
+  <rect x="40" y="352" width="260" height="50" rx="4" fill="#f0f4ff" stroke="#6b82dd" stroke-width="1"/>
+  <text x="170" y="368" text-anchor="middle" font-size="8.5" fill="#1a2a6c" font-weight="600">S-box security note</text>
+  <text x="55" y="384" font-size="8" fill="#555">S depends on key — different keys → different</text>
+  <text x="55" y="396" font-size="8" fill="#555">permutations → different keystreams</text>
+
+  <line x1="170" y1="402" x2="170" y2="420" stroke="#333" stroke-width="1.5" marker-end="url(#ka)"/>
+  <rect x="55" y="420" width="230" height="20" rx="10" fill="#7c3aed"/>
+  <text x="170" y="434" text-anchor="middle" font-size="9" fill="#fff">→ PRGA Phase</text>
+</svg>
+</div>
+</div>
+
+<!-- PRGA + XOR -->
+<div>
+<div class="fc-wrap">
+<svg width="340" height="490" viewBox="0 0 340 490" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="pr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#333"/></marker></defs>
+  <text x="170" y="18" text-anchor="middle" font-size="10" font-weight="700" fill="#7c3aed">PHASE 2: PRGA + XOR ENCRYPTION</text>
+
+  <rect x="55" y="28" width="230" height="30" rx="15" fill="#7c3aed"/>
+  <text x="170" y="48" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">START: S-box ready</text>
+  <line x1="170" y1="58" x2="170" y2="76" stroke="#333" stroke-width="1.5" marker-end="url(#pr)"/>
+
+  <rect x="55" y="76" width="230" height="28" rx="4" fill="#fef3c7" stroke="#cc8800" stroke-width="1.5"/>
+  <text x="170" y="96" text-anchor="middle" font-size="9.5" fill="#111">i = 0,   j = 0</text>
+  <line x1="170" y1="104" x2="170" y2="122" stroke="#333" stroke-width="1.5" marker-end="url(#pr)"/>
+
+  <!-- Loop header -->
+  <rect x="55" y="122" width="230" height="28" rx="4" fill="#fef3c7" stroke="#cc8800" stroke-width="1.5"/>
+  <text x="170" y="142" text-anchor="middle" font-size="9.5" fill="#111">for each input byte P[k]:</text>
+  <line x1="170" y1="150" x2="170" y2="168" stroke="#333" stroke-width="1.5" marker-end="url(#pr)"/>
+
+  <!-- PRGA state update -->
+  <rect x="55" y="168" width="230" height="60" rx="4" fill="#fce7f3" stroke="#9333ea" stroke-width="1.5"/>
+  <text x="170" y="184" text-anchor="middle" font-size="9" fill="#111" font-weight="500">Update PRGA state</text>
+  <text x="75" y="200" font-size="8.5" fill="#111" class="mono">i = (i + 1) mod 256</text>
+  <text x="75" y="214" font-size="8.5" fill="#111" class="mono">j = (j + S[i]) mod 256</text>
+  <text x="75" y="228" font-size="8.5" fill="#555" class="mono">swap(S[i], S[j])</text>
+  <line x1="170" y1="228" x2="170" y2="246" stroke="#333" stroke-width="1.5" marker-end="url(#pr)"/>
+
+  <!-- Keystream byte -->
+  <rect x="55" y="246" width="230" height="36" rx="4" fill="#fce7f3" stroke="#9333ea" stroke-width="1.5"/>
+  <text x="170" y="261" text-anchor="middle" font-size="9.5" fill="#111">Generate keystream byte</text>
+  <text x="170" y="275" text-anchor="middle" font-size="8.5" fill="#111" class="mono">K[k] = S[(S[i]+S[j]) mod 256]</text>
+  <line x1="170" y1="282" x2="170" y2="300" stroke="#333" stroke-width="1.5" marker-end="url(#pr)"/>
+
+  <!-- XOR -->
+  <rect x="55" y="300" width="230" height="46" rx="4" fill="#dbeafe" stroke="#1a5cbb" stroke-width="1.5"/>
+  <text x="170" y="316" text-anchor="middle" font-size="9.5" fill="#111" font-weight="500">XOR with input byte</text>
+  <text x="170" y="332" text-anchor="middle" font-size="12" fill="#1a2a6c" font-style="italic">C[k] = P[k] ⊕ K[k]</text>
+  <text x="170" y="344" text-anchor="middle" font-size="8" fill="#666">Decrypt: P[k] = C[k] ⊕ K[k] — identical</text>
+  <line x1="170" y1="346" x2="170" y2="364" stroke="#333" stroke-width="1.5" marker-end="url(#pr)"/>
+
+  <polygon points="170,364 285,384 170,404 55,384" fill="#fff9e6" stroke="#cc8800" stroke-width="1.5"/>
+  <text x="170" y="388" text-anchor="middle" font-size="9" fill="#111">More bytes?</text>
+  <!-- YES -->
+  <line x1="55" y1="384" x2="20" y2="384" stroke="#cc8800" stroke-width="1.5"/>
+  <line x1="20" y1="384" x2="20" y2="136" stroke="#cc8800" stroke-width="1.5"/>
+  <line x1="20" y1="136" x2="54" y2="136" stroke="#cc8800" stroke-width="1.5" marker-end="url(#pr)"/>
+  <text x="12" y="264" text-anchor="middle" font-size="8" fill="#cc8800" transform="rotate(-90,12,264)">YES</text>
+  <!-- NO -->
+  <line x1="170" y1="404" x2="170" y2="422" stroke="#1a7a44" stroke-width="1.5" marker-end="url(#pr)"/>
+  <text x="180" y="418" font-size="8" fill="#1a7a44">NO</text>
+
+  <rect x="40" y="422" width="260" height="28" rx="4" fill="#d1fae5" stroke="#1a7a44" stroke-width="1.5"/>
+  <text x="170" y="436" text-anchor="middle" font-size="9.5" fill="#111">Output encrypted/decrypted stream</text>
+  <text x="170" y="448" text-anchor="middle" font-size="8" fill="#555">XOR self-inverse → enc = dec operation</text>
+  <line x1="170" y1="450" x2="170" y2="468" stroke="#333" stroke-width="1.5" marker-end="url(#pr)"/>
+
+  <rect x="55" y="468" width="230" height="20" rx="10" fill="#7c3aed"/>
+  <text x="170" y="482" text-anchor="middle" font-size="9" fill="#fff">END</text>
+</svg>
+</div>
+</div>
+</div>
+<p class="fc-caption">Figure 7: RC4 KSA (left) initialises the 256-byte S-box from the key. PRGA (right) generates one keystream byte per input byte via S-box state updates; XOR produces ciphertext. Encrypt = Decrypt.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     FC-8  RAIL FENCE CIPHER
+     ══════════════════════════════════════════════════ -->
+<div class="fc-section">
+<div class="fc-title">Figure 8 — Rail Fence Cipher (Transposition)</div>
+<div class="fc-grid2">
+
+<!-- ENCRYPT -->
+<div>
+<div class="fc-wrap">
+<svg width="340" height="500" viewBox="0 0 340 500" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="re" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#333"/></marker></defs>
+  <text x="170" y="18" text-anchor="middle" font-size="10" font-weight="700" fill="#1a2a6c">RAIL FENCE — ENCRYPT</text>
+
+  <rect x="55" y="28" width="230" height="30" rx="15" fill="#1a2a6c"/>
+  <text x="170" y="48" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">START</text>
+  <line x1="170" y1="58" x2="170" y2="76" stroke="#333" stroke-width="1.5" marker-end="url(#re)"/>
+
+  <polygon points="55,76 285,76 275,104 65,104" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="170" y="95" text-anchor="middle" font-size="9.5" fill="#111">Input: RGB byte stream, r = num rails</text>
+  <line x1="170" y1="104" x2="170" y2="122" stroke="#333" stroke-width="1.5" marker-end="url(#re)"/>
+
+  <rect x="55" y="122" width="230" height="36" rx="4" fill="#dbeafe" stroke="#1a5cbb" stroke-width="1.5"/>
+  <text x="170" y="137" text-anchor="middle" font-size="9.5" fill="#111">Initialise r empty rail lists</text>
+  <text x="170" y="150" text-anchor="middle" font-size="8.5" fill="#555" class="mono">fence[0..r-1] = []</text>
+  <line x1="170" y1="158" x2="170" y2="176" stroke="#333" stroke-width="1.5" marker-end="url(#re)"/>
+
+  <rect x="55" y="176" width="230" height="36" rx="4" fill="#fef3c7" stroke="#cc8800" stroke-width="1.5"/>
+  <text x="170" y="191" text-anchor="middle" font-size="9.5" fill="#111">rail = 0,   down = true</text>
+  <text x="170" y="204" text-anchor="middle" font-size="8.5" fill="#555">for each byte B in stream:</text>
+  <line x1="170" y1="212" x2="170" y2="230" stroke="#333" stroke-width="1.5" marker-end="url(#re)"/>
+
+  <rect x="55" y="230" width="230" height="28" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="170" y="249" text-anchor="middle" font-size="9.5" fill="#111">fence[rail].append(B)</text>
+  <line x1="170" y1="258" x2="170" y2="276" stroke="#333" stroke-width="1.5" marker-end="url(#re)"/>
+
+  <polygon points="170,276 290,296 170,316 50,296" fill="#fff9e6" stroke="#cc8800" stroke-width="1.5"/>
+  <text x="170" y="292" text-anchor="middle" font-size="9" fill="#111">rail = r−1</text>
+  <text x="170" y="304" text-anchor="middle" font-size="9" fill="#111">or rail = 0?</text>
+  <line x1="290" y1="296" x2="320" y2="296" stroke="#cc8800" stroke-width="1.5"/>
+  <rect x="322" y="286" width="12" height="20" fill="none"/>
+  <text x="315" y="286" font-size="8" fill="#cc8800">flip</text>
+  <line x1="320" y1="296" x2="320" y2="256" stroke="#cc8800" stroke-width="1.5"/>
+  <text x="330" y="278" font-size="8" fill="#cc8800" transform="rotate(-90,330,278)">flip dir</text>
+  <!-- NO → loop -->
+  <line x1="50" y1="296" x2="20" y2="296" stroke="#cc8800" stroke-width="1.5"/>
+  <line x1="20" y1="296" x2="20" y2="244" stroke="#cc8800" stroke-width="1.5"/>
+  <line x1="20" y1="244" x2="54" y2="244" stroke="#cc8800" stroke-width="1.5" marker-end="url(#re)"/>
+  <text x="12" y="274" text-anchor="middle" font-size="8" fill="#cc8800" transform="rotate(-90,12,274)">next byte</text>
+
+  <line x1="170" y1="316" x2="170" y2="336" stroke="#1a7a44" stroke-width="1.5" marker-end="url(#re)"/>
+
+  <rect x="55" y="336" width="230" height="46" rx="4" fill="#d1fae5" stroke="#1a7a44" stroke-width="1.5"/>
+  <text x="170" y="351" text-anchor="middle" font-size="9.5" fill="#111" font-weight="500">Read rails in order: 0 → r−1</text>
+  <text x="170" y="365" text-anchor="middle" font-size="8.5" fill="#555">Concatenate all rail lists</text>
+  <text x="170" y="377" text-anchor="middle" font-size="8" fill="#888" class="mono">output = fence[0]+fence[1]+…+fence[r−1]</text>
+  <line x1="170" y1="382" x2="170" y2="400" stroke="#333" stroke-width="1.5" marker-end="url(#re)"/>
+
+  <rect x="40" y="400" width="260" height="54" rx="4" fill="#f0f4ff" stroke="#6b82dd" stroke-width="1"/>
+  <text x="170" y="416" text-anchor="middle" font-size="8.5" fill="#1a2a6c" font-weight="600">Example  r=3, input: [B₀ B₁ B₂ B₃ B₄ B₅ B₆]</text>
+  <text x="60" y="432" font-size="8.5" fill="#333" class="mono">Rail 0: B₀  B₄</text>
+  <text x="60" y="444" font-size="8.5" fill="#333" class="mono">Rail 1: B₁  B₃  B₅</text>
+  <text x="60" y="456" font-size="8.5" fill="#333" class="mono">Rail 2: B₂  B₆</text>
+
+  <rect x="55" y="462" width="230" height="20" rx="10" fill="#1a2a6c"/>
+  <text x="170" y="476" text-anchor="middle" font-size="9" fill="#fff">END</text>
+</svg>
+</div>
+</div>
+
+<!-- DECRYPT -->
+<div>
+<div class="fc-wrap">
+<svg width="340" height="500" viewBox="0 0 340 500" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="rd" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#333"/></marker></defs>
+  <text x="170" y="18" text-anchor="middle" font-size="10" font-weight="700" fill="#7c3aed">RAIL FENCE — DECRYPT</text>
+
+  <rect x="55" y="28" width="230" height="30" rx="15" fill="#7c3aed"/>
+  <text x="170" y="48" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">START</text>
+  <line x1="170" y1="58" x2="170" y2="76" stroke="#333" stroke-width="1.5" marker-end="url(#rd)"/>
+
+  <polygon points="55,76 285,76 275,104 65,104" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="170" y="95" text-anchor="middle" font-size="9.5" fill="#111">Input: cipher stream + r rails (same key)</text>
+  <line x1="170" y1="104" x2="170" y2="122" stroke="#333" stroke-width="1.5" marker-end="url(#rd)"/>
+
+  <rect x="55" y="122" width="230" height="46" rx="4" fill="#fce7f3" stroke="#9333ea" stroke-width="1.5"/>
+  <text x="170" y="137" text-anchor="middle" font-size="9.5" fill="#111">Precompute rail assignment</text>
+  <text x="170" y="151" text-anchor="middle" font-size="8.5" fill="#555" class="mono">railIdx[i] = rail index for position i</text>
+  <text x="170" y="163" text-anchor="middle" font-size="8" fill="#888">using same zigzag pattern as encrypt</text>
+  <line x1="170" y1="168" x2="170" y2="186" stroke="#333" stroke-width="1.5" marker-end="url(#rd)"/>
+
+  <rect x="55" y="186" width="230" height="36" rx="4" fill="#fce7f3" stroke="#9333ea" stroke-width="1.5"/>
+  <text x="170" y="201" text-anchor="middle" font-size="9.5" fill="#111">Count bytes per rail</text>
+  <text x="170" y="214" text-anchor="middle" font-size="8.5" fill="#555" class="mono">railCounts[r]  →  railOffsets[r]</text>
+  <line x1="170" y1="222" x2="170" y2="240" stroke="#333" stroke-width="1.5" marker-end="url(#rd)"/>
+
+  <rect x="55" y="240" width="230" height="46" rx="4" fill="#fce7f3" stroke="#9333ea" stroke-width="1.5"/>
+  <text x="170" y="255" text-anchor="middle" font-size="9.5" fill="#111">Map ciphertext to original positions</text>
+  <text x="170" y="269" text-anchor="middle" font-size="8.5" fill="#555" class="mono">result[i] = cipher[railPos[railIdx[i]]]</text>
+  <text x="170" y="281" text-anchor="middle" font-size="8" fill="#888">railPos[rail]++ advances per-rail pointer</text>
+  <line x1="170" y1="286" x2="170" y2="304" stroke="#333" stroke-width="1.5" marker-end="url(#rd)"/>
+
+  <polygon points="170,304 285,322 170,340 55,322" fill="#fff9e6" stroke="#cc8800" stroke-width="1.5"/>
+  <text x="170" y="326" text-anchor="middle" font-size="9" fill="#111">All bytes</text>
+  <text x="170" y="338" text-anchor="middle" font-size="9" fill="#111">placed?</text>
+  <line x1="55" y1="322" x2="20" y2="322" stroke="#cc8800" stroke-width="1.5"/>
+  <line x1="20" y1="322" x2="20" y2="268" stroke="#cc8800" stroke-width="1.5"/>
+  <line x1="20" y1="268" x2="54" y2="262" stroke="#cc8800" stroke-width="1.5" marker-end="url(#rd)"/>
+  <text x="12" y="298" text-anchor="middle" font-size="8" fill="#cc8800" transform="rotate(-90,12,298)">NO</text>
+  <line x1="170" y1="340" x2="170" y2="358" stroke="#1a7a44" stroke-width="1.5" marker-end="url(#rd)"/>
+  <text x="180" y="354" font-size="8" fill="#1a7a44">YES</text>
+
+  <rect x="55" y="358" width="230" height="36" rx="4" fill="#d1fae5" stroke="#1a7a44" stroke-width="1.5"/>
+  <text x="170" y="373" text-anchor="middle" font-size="9.5" fill="#111">Output: original byte order restored</text>
+  <text x="170" y="385" text-anchor="middle" font-size="8.5" fill="#555">Values unchanged — pure transposition</text>
+  <line x1="170" y1="394" x2="170" y2="412" stroke="#333" stroke-width="1.5" marker-end="url(#rd)"/>
+
+  <rect x="40" y="412" width="260" height="42" rx="4" fill="#f5f0ff" stroke="#9333ea" stroke-width="1"/>
+  <text x="170" y="428" text-anchor="middle" font-size="8.5" fill="#7c3aed" font-weight="600">Security note</text>
+  <text x="55" y="442" font-size="8" fill="#555">Byte values unchanged → histogram identical</text>
+  <text x="55" y="452" font-size="8" fill="#555">Only spatial arrangement is altered</text>
+
+  <rect x="55" y="462" width="230" height="20" rx="10" fill="#7c3aed"/>
+  <text x="170" y="476" text-anchor="middle" font-size="9" fill="#fff">END — original order restored ✓</text>
+</svg>
+</div>
+</div>
+</div>
+<p class="fc-caption">Figure 8: Rail Fence encrypt (left) writes bytes to rails in zigzag order, then reads rails sequentially. Decrypt (right) reverses by precomputing rail assignments and remapping positions.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     FC-9  CIPHER FACTORY & ALGORITHM SELECTION
+     ══════════════════════════════════════════════════ -->
+<div class="fc-section">
+<div class="fc-title">Figure 9 — CipherFactory: Algorithm Selection &amp; Dispatch</div>
+<div class="fc-subtitle">How the backend routes algorithm string identifiers to concrete cipher objects</div>
+<div class="fc-wrap">
+<svg width="760" height="400" viewBox="0 0 760 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="cf" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#333"/></marker>
+    <marker id="cfB" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#1a5cbb"/></marker>
+  </defs>
+
+  <!-- Entry -->
+  <polygon points="140,20 620,20 610,50 150,50" fill="#1a2a6c" stroke="none"/>
+  <text x="380" y="40" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">CipherFactory::createCipher(algorithm, key, param)</text>
+  <line x1="380" y1="50" x2="380" y2="70" stroke="#333" stroke-width="1.5" marker-end="url(#cf)"/>
+
+  <!-- Decision diamond -->
+  <polygon points="380,70 550,110 380,150 210,110" fill="#fff9e6" stroke="#cc8800" stroke-width="2"/>
+  <text x="380" y="106" text-anchor="middle" font-size="9.5" fill="#111">algorithm</text>
+  <text x="380" y="120" text-anchor="middle" font-size="9.5" fill="#111">== ?</text>
+
+  <!-- caesar -->
+  <line x1="238" y1="80" x2="70" y2="80" stroke="#1a5cbb" stroke-width="1.5" marker-end="url(#cfB)"/>
+  <text x="154" y="74" text-anchor="middle" font-size="8" fill="#1a5cbb">"caesar"</text>
+  <rect x="10" y="90" width="120" height="50" rx="4" fill="#dbeafe" stroke="#1a5cbb" stroke-width="1.5"/>
+  <text x="70" y="110" text-anchor="middle" font-size="9" fill="#111" font-weight="500">CaesarCipher</text>
+  <text x="70" y="124" text-anchor="middle" font-size="8" fill="#555" class="mono">shift = stoi(key)</text>
+  <text x="70" y="135" text-anchor="middle" font-size="8" fill="#888">default: 3</text>
+
+  <!-- multiplicative -->
+  <line x1="258" y1="98" x2="130" y2="175" stroke="#1a5cbb" stroke-width="1.5" marker-end="url(#cfB)"/>
+  <text x="178" y="128" text-anchor="middle" font-size="8" fill="#1a5cbb">"multiplicative"</text>
+  <rect x="20" y="175" width="160" height="50" rx="4" fill="#dbeafe" stroke="#1a5cbb" stroke-width="1.5"/>
+  <text x="100" y="195" text-anchor="middle" font-size="9" fill="#111" font-weight="500">MultiplicativeCipher</text>
+  <text x="100" y="209" text-anchor="middle" font-size="8" fill="#555" class="mono">key = stoi(key)</text>
+  <text x="100" y="220" text-anchor="middle" font-size="8" fill="#888">validate gcd(k,256)=1</text>
+
+  <!-- affine -->
+  <line x1="290" y1="138" x2="200" y2="250" stroke="#1a5cbb" stroke-width="1.5" marker-end="url(#cfB)"/>
+  <text x="228" y="196" text-anchor="middle" font-size="8" fill="#1a5cbb">"affine"</text>
+  <rect x="90" y="258" width="160" height="50" rx="4" fill="#dbeafe" stroke="#1a5cbb" stroke-width="1.5"/>
+  <text x="170" y="278" text-anchor="middle" font-size="9" fill="#111" font-weight="500">AffineCipher</text>
+  <text x="170" y="292" text-anchor="middle" font-size="8" fill="#555" class="mono">a,b = split(key,',')</text>
+  <text x="170" y="303" text-anchor="middle" font-size="8" fill="#888">validate gcd(a,256)=1</text>
+
+  <!-- playfair -->
+  <line x1="380" y1="150" x2="380" y2="280" stroke="#1a7a44" stroke-width="1.5" marker-end="url(#cf)"/>
+  <text x="390" y="220" font-size="8" fill="#1a7a44">"playfair"</text>
+  <rect x="290" y="280" width="180" height="50" rx="4" fill="#d1fae5" stroke="#1a7a44" stroke-width="1.5"/>
+  <text x="380" y="300" text-anchor="middle" font-size="9" fill="#111" font-weight="500">PlayfairCipher</text>
+  <text x="380" y="314" text-anchor="middle" font-size="8" fill="#555" class="mono">key = string</text>
+  <text x="380" y="325" text-anchor="middle" font-size="8" fill="#888">build 16×16 square</text>
+
+  <!-- hill -->
+  <line x1="470" y1="138" x2="540" y2="258" stroke="#9333ea" stroke-width="1.5" marker-end="url(#cf)"/>
+  <text x="512" y="196" text-anchor="middle" font-size="8" fill="#9333ea">"hill"</text>
+  <rect x="490" y="258" width="160" height="50" rx="4" fill="#fce7f3" stroke="#9333ea" stroke-width="1.5"/>
+  <text x="570" y="278" text-anchor="middle" font-size="9" fill="#111" font-weight="500">HillCipher</text>
+  <text x="570" y="292" text-anchor="middle" font-size="8" fill="#555" class="mono">matrix = parse(key)</text>
+  <text x="570" y="303" text-anchor="middle" font-size="8" fill="#888">n = stoi(param)</text>
+
+  <!-- rc4 -->
+  <line x1="502" y1="98" x2="630" y2="175" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#cf)"/>
+  <text x="575" y="128" text-anchor="middle" font-size="8" fill="#7c3aed">"rc4"</text>
+  <rect x="580" y="175" width="160" height="50" rx="4" fill="#f3e8ff" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="660" y="195" text-anchor="middle" font-size="9" fill="#111" font-weight="500">RC4Cipher</text>
+  <text x="660" y="209" text-anchor="middle" font-size="8" fill="#555" class="mono">key = string</text>
+  <text x="660" y="220" text-anchor="middle" font-size="8" fill="#888">1..256 bytes</text>
+
+  <!-- railfence -->
+  <line x1="522" y1="80" x2="690" y2="80" stroke="#059669" stroke-width="1.5" marker-end="url(#cf)"/>
+  <text x="606" y="74" text-anchor="middle" font-size="8" fill="#059669">"railfence"</text>
+  <rect x="630" y="90" width="120" height="50" rx="4" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+  <text x="690" y="110" text-anchor="middle" font-size="9" fill="#111" font-weight="500">RailFence</text>
+  <text x="690" y="124" text-anchor="middle" font-size="8" fill="#555" class="mono">r = stoi(param)</text>
+  <text x="690" y="135" text-anchor="middle" font-size="8" fill="#888">default: 3</text>
+
+  <!-- All join to pipeline -->
+  <text x="380" y="368" text-anchor="middle" font-size="9.5" fill="#555">All branches return std::unique_ptr&lt;CipherBase&gt;</text>
+  <text x="380" y="384" text-anchor="middle" font-size="9.5" fill="#555">→ passed to EncryptionPipeline or DecryptionPipeline</text>
+</svg>
+</div>
+<p class="fc-caption">Figure 9: CipherFactory::createCipher() dispatch logic. Each algorithm string maps to a concrete cipher class. All implement the CipherBase interface (encrypt, decrypt, validateKey).</p>
+</div>
+
+</body>
+</html>
