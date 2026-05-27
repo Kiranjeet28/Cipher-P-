@@ -114,6 +114,36 @@ tr:nth-child(even) { background: #f8f8f8; }
 /* ─── FIGURES ─── */
 .fig-caption { font-size: 9pt; color: #555; text-align: center; margin-top: 6px; font-style: italic; }
 
+/* ─── VISUALIZATION PLACEHOLDERS ─── */
+.viz-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 12px 0;
+}
+.viz-stage-card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #f9fafb;
+  padding: 10px;
+  page-break-inside: avoid;
+}
+.viz-stage-thumb {
+  min-height: 84px;
+  border-radius: 8px;
+  border: 1px dashed #99a;
+  background: linear-gradient(135deg, rgba(68,102,187,0.08), rgba(51,170,102,0.08));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 8.8pt;
+  color: #335;
+  padding: 8px;
+}
+.viz-stage-title { font-size: 10pt; font-weight: 600; margin-top: 8px; }
+.viz-stage-note { font-size: 8.7pt; color: #666; margin-top: 4px; }
+
 /* ─── CALLOUT ─── */
 .callout {
   background: #f0f4ff;
@@ -762,37 +792,93 @@ for each input byte P[k]:
      ═══════════════════════════════════════════ -->
 <div class="page-break">
 <h2>7. Frontend Visualization System</h2>
-<p>The frontend is designed not merely as a form interface but as a visualisation layer that communicates the state of the real backend processing pipeline to the user through animation and live feedback.</p>
+<p>The frontend is designed not merely as a form interface but as a visualisation layer that communicates the state of the real backend processing pipeline to the user through animation and live feedback. The current implementation uses a downscaled live preview canvas, a mode-aware stage rail, algorithm-specific byte animations, and request-synchronised progress controls so that the animation reflects the actual request lifecycle rather than a decorative mock-up.</p>
 
-<h3>7.1 Backend Health Monitor</h3>
-<p>On page load, <span class="mono">app.js</span> calls <span class="mono">GET /api/health</span> with a 4-second timeout using <span class="mono">AbortSignal.timeout(4000)</span>. If the backend responds, the server status badge turns green with a pulsing animation. If the backend is offline, it shows an orange badge with the message "Backend offline — start ImageCrypto.exe". This check repeats every 15 seconds. Encrypt and decrypt buttons remain disabled until a healthy backend is confirmed.</p>
+<h3>7.1 Visualization Engine Architecture</h3>
+<p>The visualization engine is built as a modular client-side subsystem inside <span class="mono">app.js</span>. It derives a preview image from the original canvas, generates deterministic pixel permutations from the same key material used by the backend, applies algorithm-specific byte transformations, and animates the reconstruction and diffusion stages in real time. The engine intentionally keeps the preview resolution small to maintain smooth rendering on large images.</p>
 
-<h3>7.2 Upload Zone and Image Preview</h3>
-<p>The drag-and-drop upload zone accepts files via three mechanisms: file dialog (<span class="mono">browseBtn</span>), drag-and-drop events on the zone div, and clipboard paste (<span class="mono">paste</span> event). Once loaded, the image is drawn to <span class="mono">canvasOriginal</span>. After encryption, the result PNG blob is drawn to <span class="mono">canvasResult</span>, providing a side-by-side comparison. Metadata — pixel dimensions and file size — is displayed below each canvas.</p>
+<p>The control surface includes pause, replay, speed, and advanced-visualization toggles. These controls affect only the local animation timeline; the backend request still runs normally, preserving API compatibility and avoiding any coupling between rendering and transport logic.</p>
 
-<h3>7.3 Processing Overlay Animation</h3>
-<p>When the Encrypt or Decrypt button is pressed, a full-screen overlay appears showing three concentric rotating rings (cyan, purple, pink) and a six-step progress list reflecting the actual backend processing stages. The steps are updated sequentially as the frontend progresses through its request lifecycle:</p>
+<h3>7.2 Side-by-Side Comparison View</h3>
+<p>The comparison panel now contains three synchronized canvases: the original image, a live transforming preview, and the final encrypted or decrypted result returned by the backend. This layout allows the user to compare spatial structure, byte-level motion, and the final ciphertext image in a single viewport.</p>
+
+<div class="viz-gallery">
+  <div class="viz-stage-card">
+    <div class="viz-stage-thumb">Original image<br>stable reference frame</div>
+    <div class="viz-stage-title">Original</div>
+    <div class="viz-stage-note">Used as the source buffer for the animated preview and the backend request payload.</div>
+  </div>
+  <div class="viz-stage-card">
+    <div class="viz-stage-thumb">Live transform<br>pixel motion, byte shifts, block mixing</div>
+    <div class="viz-stage-title">Live Transform</div>
+    <div class="viz-stage-note">Updated from a deterministic preview pipeline that mirrors the real encryption or decryption path.</div>
+  </div>
+  <div class="viz-stage-card">
+    <div class="viz-stage-thumb">Final output<br>backend result blob</div>
+    <div class="viz-stage-title">Final</div>
+    <div class="viz-stage-note">Replaced with the exact PNG returned by the C++ backend once processing completes.</div>
+  </div>
+</div>
+
+<h3>7.3 Pipeline Animation Workflow</h3>
+<p>During encryption, the pipeline rail highlights the following sequence: Original → Pixel Extraction → Permutation → Algorithm → Diffusion → Reconstruction → Final. During decryption, the rail switches to the inverse interpretation: Encrypted Input → Pixel Extraction → Diffusion Removal → Algorithm Inversion → Unshuffle → Reconstruction → Decrypted. The rail pulses in sync with the live preview and the overlay progress indicator.</p>
 
 <table>
-  <thead><tr><th>Step ID</th><th>Frontend Action</th><th>Backend Action</th></tr></thead>
+  <thead><tr><th>Stage</th><th>Encryption Animation</th><th>Decryption Animation</th><th>UI Response</th></tr></thead>
   <tbody>
-    <tr><td>upload</td><td>FormData constructed, fetch() called</td><td>Request received</td></tr>
+    <tr><td>Pixel Extraction</td><td>RGBA buffer is sampled into RGB bytes</td><td>Encrypted image is sampled into RGB bytes</td><td>Step glow advances and the live bytes panel begins updating</td></tr>
+    <tr><td>Permutation</td><td>Pixels slide into a shuffled spatial order</td><td>Permutation is visually unwound</td><td>Active rail node glows cyan</td></tr>
+    <tr><td>Algorithm</td><td>Selected cipher reshapes the byte stream</td><td>Inverse cipher restores the permuted bytes</td><td>Stage label switches to the selected algorithm name</td></tr>
+    <tr><td>Diffusion</td><td>XOR keystream floods the preview with key-driven noise</td><td>The same keystream is removed</td><td>Progress jumps into the final third of the pipeline</td></tr>
+    <tr><td>Reconstruction</td><td>Encrypted RGB bytes are reinserted into the RGBA buffer</td><td>Recovered bytes are unshuffled and reinserted</td><td>Final transition fades to the backend PNG output</td></tr>
+  </tbody>
+</table>
+
+<h3>7.4 Algorithm-Specific Animations</h3>
+<p><strong>Caesar</strong> is animated as a smooth byte-offset sweep in which RGB values drift by a constant shift, making the preview appear as a global tint change before diffusion intensifies the effect. <strong>Affine</strong> uses a nonlinear mapping with a position-dependent bias, so the byte bars in the visualization curve rather than move uniformly.</p>
+
+<p><strong>Hill</strong> is shown as block-based matrix multiplication: preview pixels are grouped into small blocks and their values are mixed by the key matrix, producing visible local decorrelation. <strong>RC4</strong> appears as keystream-driven XOR noise, where the live preview rapidly loses its original structure and approaches a random field. <strong>RailFence</strong> is presented as a zigzag spatial permutation that moves pixels between rails before the common diffusion stage is applied.</p>
+
+<h3>7.5 Animation Stage Placeholders</h3>
+<p>The report includes placeholders for the live animation stages below so the finished report can be paired with captured screenshots from the running application. Each placeholder corresponds to a stage that the visualization engine renders in the browser.</p>
+
+<div class="viz-gallery">
+  <div class="viz-stage-card"><div class="viz-stage-thumb">Stage 1<br>Pixel Extraction</div><div class="viz-stage-title">Extraction</div><div class="viz-stage-note">Preview of the RGB stream being sampled from RGBA pixels.</div></div>
+  <div class="viz-stage-card"><div class="viz-stage-thumb">Stage 2<br>Permutation</div><div class="viz-stage-title">Permutation</div><div class="viz-stage-note">Downscaled pixel shuffling with motion trails.</div></div>
+  <div class="viz-stage-card"><div class="viz-stage-thumb">Stage 3<br>Algorithm Processing</div><div class="viz-stage-title">Algorithm</div><div class="viz-stage-note">Cipher-specific byte changes: shift, matrix multiply, or keystream XOR.</div></div>
+  <div class="viz-stage-card"><div class="viz-stage-thumb">Stage 4<br>Diffusion</div><div class="viz-stage-title">Diffusion</div><div class="viz-stage-note">Key-derived XOR noise spreads through the preview.</div></div>
+  <div class="viz-stage-card"><div class="viz-stage-thumb">Stage 5<br>Reconstruction</div><div class="viz-stage-title">Reconstruction</div><div class="viz-stage-note">Encrypted or decrypted bytes written back into image space.</div></div>
+  <div class="viz-stage-card"><div class="viz-stage-thumb">Stage 6<br>Final Output</div><div class="viz-stage-title">Output</div><div class="viz-stage-note">Exact backend PNG result displayed alongside the live preview.</div></div>
+</div>
+
+<h3>7.6 Backend Health Monitor</h3>
+<p>On page load, <span class="mono">app.js</span> calls <span class="mono">GET /api/health</span> with a 4-second timeout using <span class="mono">AbortSignal.timeout(4000)</span>. If the backend responds, the server status badge turns green with a pulsing animation. If the backend is offline, it shows an orange badge with the message "Backend offline — start ImageCrypto.exe". This check repeats every 15 seconds. Encrypt and decrypt buttons remain disabled until a healthy backend is confirmed.</p>
+
+<h3>7.7 Upload Zone and Image Preview</h3>
+<p>The drag-and-drop upload zone accepts files via three mechanisms: file dialog (<span class="mono">browseBtn</span>), drag-and-drop events on the zone div, and clipboard paste (<span class="mono">paste</span> event). Once loaded, the image is drawn to <span class="mono">canvasOriginal</span>. After encryption, the result PNG blob is drawn to <span class="mono">canvasResult</span>, providing a side-by-side comparison. Metadata — pixel dimensions and file size — is displayed below each canvas.</p>
+
+<h3>7.8 Processing Overlay Animation</h3>
+<p>When the Encrypt or Decrypt button is pressed, a full-screen overlay appears showing three concentric rotating rings (cyan, purple, pink) and a stage list reflecting the active backend lifecycle. The overlay uses the same step labels as the live pipeline rail, so the modal and the inline visualization remain synchronized throughout the request.</p>
+
+<table>
+  <thead><tr><th>Stage</th><th>Frontend Action</th><th>Backend Action</th></tr></thead>
+  <tbody>
+    <tr><td>upload</td><td>FormData constructed, fetch() called</td><td>Request received by the C++ server</td></tr>
     <tr><td>decode</td><td>Awaiting response</td><td>ImageLoader::loadFromMemory()</td></tr>
-    <tr><td>extract</td><td>Awaiting response</td><td>PixelProcessor::extractRGBStream()</td></tr>
-    <tr><td>cipher</td><td>Awaiting response</td><td>cipher_→encrypt()</td></tr>
-    <tr><td>reconstruct</td><td>res.ok verified</td><td>encodePNG()</td></tr>
+    <tr><td>permute</td><td>Live preview begins spatial shuffling</td><td>Pixel permutation in the processing pipeline</td></tr>
+    <tr><td>cipher</td><td>Selected algorithm animation begins</td><td>cipher_-&gt;encrypt() or decrypt()</td></tr>
+    <tr><td>diffuse</td><td>XOR visualisation intensifies</td><td>Key-derived diffusion applied or removed</td></tr>
+    <tr><td>reconstruct</td><td>Result canvas prepared</td><td>RGB stream written back to RGBA buffer</td></tr>
     <tr><td>transfer</td><td>res.blob() resolved</td><td>HTTP stream complete</td></tr>
+    <tr><td>complete</td><td>Statistics and download enabled</td><td>PNG delivered to the frontend</td></tr>
   </tbody>
 </table>
 <p class="tbl-caption">Table 3 — Overlay animation steps mapped to backend processing</p>
 
-<h3>7.4 Pipeline Visualisation in UI</h3>
-<p>Between the original and result canvases, a vertical pipeline of four labelled stages is displayed: Decode → Pixels → Cipher → Output. During processing, CSS classes <span class="mono">active</span> and <span class="mono">done</span> are applied sequentially using <span class="mono">activatePipelineStep()</span> and <span class="mono">completePipelineVis()</span>. These classes apply glow borders and colour changes that visually trace the pipeline as the HTTP round trip completes.</p>
-
-<h3>7.5 Live Statistics</h3>
+<h3>7.9 Live Statistics</h3>
 <p>After a successful response, the statistics panel displays: processing time in milliseconds (measured client-side via <span class="mono">performance.now()</span>), total pixel count (width × height), an approximate entropy value, and the algorithm identifier. These give the user a quantitative sense of the encryption operation just performed.</p>
 
-<h3>7.6 Particle Background</h3>
+<h3>7.10 Particle Background</h3>
 <p>A WebGL-free particle system implemented on an HTML5 canvas draws 80 particles (cyan and purple) drifting across the viewport. Pairs of particles within 100 pixels are connected with faint lines, creating a dynamic network effect. This is purely cosmetic and runs in a <span class="mono">requestAnimationFrame</span> loop without affecting the UI event loop.</p>
 </div>
 

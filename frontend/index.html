@@ -100,30 +100,99 @@
                 </div>
 
                 <div class="compare-area" id="compareArea" hidden>
-                    <div class="img-slot">
-                        <span class="img-slot-label">Original</span>
-                        <canvas id="canvasOriginal"></canvas>
-                        <span class="img-slot-info" id="infoOriginal"></span>
-                    </div>
-                    <div class="pipeline-vis" id="pipelineVis">
-                        <div class="pv-step" data-step="decode">Decode</div>
-                        <div class="pv-arrow">↓</div>
-                        <div class="pv-step" data-step="extract">Pixels</div>
-                        <div class="pv-arrow">↓</div>
-                        <div class="pv-step" data-step="cipher">Cipher</div>
-                        <div class="pv-arrow">↓</div>
-                        <div class="pv-step" data-step="reconstruct">
-                            Output
+                    <div class="compare-grid">
+                        <div class="img-slot">
+                            <span class="img-slot-label">Original</span>
+                            <canvas id="canvasOriginal"></canvas>
+                            <span class="img-slot-info" id="infoOriginal"></span>
+                        </div>
+                        <div class="img-slot live-slot">
+                            <span class="img-slot-label">Live Transform</span>
+                            <canvas id="canvasLive"></canvas>
+                            <span class="img-slot-info" id="infoLive"
+                                >Waiting for visualization...</span
+                            >
+                        </div>
+                        <div class="img-slot">
+                            <span class="img-slot-label" id="resultLabel"
+                                >Result</span
+                            >
+                            <canvas id="canvasResult"></canvas>
+                            <span class="img-slot-info" id="infoResult"
+                                >Waiting...</span
+                            >
                         </div>
                     </div>
-                    <div class="img-slot">
-                        <span class="img-slot-label" id="resultLabel"
-                            >Result</span
-                        >
-                        <canvas id="canvasResult"></canvas>
-                        <span class="img-slot-info" id="infoResult"
-                            >Waiting...</span
-                        >
+
+                    <div class="viz-dashboard">
+                        <div class="pipeline-vis" id="pipelineVis">
+                            <div class="pv-step" data-step="upload">
+                                Original
+                            </div>
+                            <div class="pv-arrow">↓</div>
+                            <div class="pv-step" data-step="decode">
+                                Pixel Extraction
+                            </div>
+                            <div class="pv-arrow">↓</div>
+                            <div class="pv-step" data-step="permute">
+                                Permutation
+                            </div>
+                            <div class="pv-arrow">↓</div>
+                            <div class="pv-step" data-step="cipher">
+                                Algorithm
+                            </div>
+                            <div class="pv-arrow">↓</div>
+                            <div class="pv-step" data-step="diffuse">
+                                Diffusion
+                            </div>
+                            <div class="pv-arrow">↓</div>
+                            <div class="pv-step" data-step="reconstruct">
+                                Reconstruction
+                            </div>
+                            <div class="pv-arrow">↓</div>
+                            <div class="pv-step" data-step="complete">Final</div>
+                        </div>
+
+                        <div class="viz-panel">
+                            <div class="viz-status">
+                                <div class="viz-status-head">
+                                    <span class="viz-title" id="vizTitle"
+                                        >Visualization Engine</span
+                                    >
+                                    <span class="viz-progress" id="vizProgress"
+                                        >0%</span
+                                    >
+                                </div>
+                                <p class="viz-sub" id="vizSub">
+                                    Waiting for a processing session to begin.
+                                </p>
+                                <div class="viz-bytes" id="vizBytes"></div>
+                            </div>
+
+                            <div class="viz-controls">
+                                <button class="viz-btn" id="vizPauseBtn" disabled>
+                                    Pause
+                                </button>
+                                <button class="viz-btn" id="vizReplayBtn" disabled>
+                                    Replay
+                                </button>
+                                <label class="viz-speed">
+                                    Speed
+                                    <input
+                                        type="range"
+                                        id="vizSpeed"
+                                        min="0.5"
+                                        max="2.5"
+                                        step="0.1"
+                                        value="1"
+                                    />
+                                </label>
+                                <label class="viz-toggle">
+                                    <input type="checkbox" id="vizAdvanced" checked />
+                                    Advanced visualization
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
