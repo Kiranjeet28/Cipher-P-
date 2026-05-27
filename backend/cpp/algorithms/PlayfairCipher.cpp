@@ -14,6 +14,7 @@ void PlayfairCipher::setKey(const std::string& key) {
 }
 
 void PlayfairCipher::buildSquare(const std::string& key) {
+    key_ = key;
     std::vector<bool> used(256, false);
     int idx = 0;
     

@@ -12,6 +12,7 @@ public:
     std::vector<unsigned char> decrypt(const std::vector<unsigned char>& data) override;
     bool validateKey() const override;
     std::string getAlgorithmName() const override { return "Affine"; }
+    std::string getKeyMaterial() const override { return std::to_string(a_) + "," + std::to_string(b_); }
     
     void setKeys(int a, int b);
     

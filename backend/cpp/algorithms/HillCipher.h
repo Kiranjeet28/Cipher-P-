@@ -13,6 +13,7 @@ public:
     std::vector<unsigned char> decrypt(const std::vector<unsigned char>& data) override;
     bool validateKey() const override;
     std::string getAlgorithmName() const override { return "Hill"; }
+    std::string getKeyMaterial() const override;
     
     void setKey(const std::vector<int>& keyMatrix, int matrixSize);
     

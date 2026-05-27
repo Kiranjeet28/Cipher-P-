@@ -31,7 +31,8 @@ std::vector<unsigned char> AffineCipher::encrypt(const std::vector<unsigned char
     std::vector<unsigned char> result(data.size());
     
     for (size_t i = 0; i < data.size(); ++i) {
-        int encrypted = (a_ * data[i] + b_) & 0xFF;
+        int positionBias = static_cast<int>((i * 31 + a_ * 17 + b_ * 13) & 0xFF);
+        int encrypted = (a_ * data[i] + b_ + positionBias) & 0xFF;
         result[i] = static_cast<unsigned char>(encrypted);
     }
     
@@ -46,7 +47,8 @@ std::vector<unsigned char> AffineCipher::decrypt(const std::vector<unsigned char
     std::vector<unsigned char> result(data.size());
     
     for (size_t i = 0; i < data.size(); ++i) {
-        int temp = (data[i] - b_) & 0xFF;
+        int positionBias = static_cast<int>((i * 31 + a_ * 17 + b_ * 13) & 0xFF);
+        int temp = (data[i] - b_ - positionBias) & 0xFF;
         int decrypted = (aInverse_ * temp) & 0xFF;
         result[i] = static_cast<unsigned char>(decrypted);
     }

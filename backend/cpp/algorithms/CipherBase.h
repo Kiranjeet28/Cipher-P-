@@ -13,6 +13,7 @@ public:
     virtual std::vector<unsigned char> decrypt(const std::vector<unsigned char>& data) = 0;
     virtual bool validateKey() const = 0;
     virtual std::string getAlgorithmName() const = 0;
+    virtual std::string getKeyMaterial() const { return {}; }
 };
 
 } // namespace Algorithms

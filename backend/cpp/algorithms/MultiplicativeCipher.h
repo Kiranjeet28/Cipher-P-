@@ -12,6 +12,7 @@ public:
     std::vector<unsigned char> decrypt(const std::vector<unsigned char>& data) override;
     bool validateKey() const override;
     std::string getAlgorithmName() const override { return "Multiplicative"; }
+    std::string getKeyMaterial() const override { return std::to_string(key_); }
     
     void setKey(int key);
     int getKey() const { return key_; }

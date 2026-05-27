@@ -36,6 +36,14 @@ bool HillCipher::validateKey() const {
            Math::MatrixOperations::isInvertible(keyMatrix_, matrixSize_, MODULUS);
 }
 
+std::string HillCipher::getKeyMaterial() const {
+    std::string material = std::to_string(matrixSize_);
+    for (int value : keyMatrix_) {
+        material += "," + std::to_string(value);
+    }
+    return material;
+}
+
 std::vector<unsigned char> HillCipher::processBlocks(const std::vector<unsigned char>& data, 
                                                      const std::vector<int>& matrix) {
     std::vector<unsigned char> result = data;

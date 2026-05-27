@@ -13,10 +13,12 @@ public:
     std::vector<unsigned char> decrypt(const std::vector<unsigned char>& data) override;
     bool validateKey() const override;
     std::string getAlgorithmName() const override { return "Playfair"; }
+    std::string getKeyMaterial() const override { return key_; }
     
     void setKey(const std::string& key);
     
 private:
+    std::string key_;
     std::array<unsigned char, 256> square_;
     std::array<int, 256> rowPosition_;
     std::array<int, 256> colPosition_;
