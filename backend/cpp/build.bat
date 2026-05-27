@@ -30,6 +30,7 @@ g++ -std=c++17 -O2 -D_WIN32_WINNT=0x0A00 ^
     math/ModularArithmetic.cpp math/MatrixOperations.cpp ^
     algorithms/CaesarCipher.cpp algorithms/MultiplicativeCipher.cpp ^
     algorithms/AffineCipher.cpp algorithms/PlayfairCipher.cpp algorithms/HillCipher.cpp ^
+    algorithms/RC4Cipher.cpp algorithms/RailFenceCipher.cpp ^
     processing/CipherFactory.cpp processing/EncryptionPipeline.cpp processing/DecryptionPipeline.cpp ^
     -lws2_32 -o ImageCrypto.exe
 

@@ -23,4 +23,4 @@ echo.
 echo ================================
 echo.
 
-ImageCrypto.exe
+"%~dp0ImageCrypto.exe"
