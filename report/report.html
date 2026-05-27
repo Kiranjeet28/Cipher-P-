@@ -174,7 +174,7 @@ hr.section { border: none; border-top: 1px solid #ccc; margin: 20px 0; }
 <div class="abstract-box">
 This project presents <strong>CipherVault</strong>, a complete image encryption and decryption engine that applies classical and stream cryptographic algorithms directly to the pixel-level byte representation of digital images. The system is built on a modular C++17 backend that exposes a RESTful API on port 5000. A modern, animated browser-based frontend communicates with this backend via HTTP multipart requests, submitting raw image data and receiving a cryptographically transformed PNG in response.
 <br><br>
-The image encryption pipeline operates as follows: images are decoded into RGBA pixel buffers, the RGB channels are extracted into a linear byte stream, the selected cipher algorithm transforms each byte through its mathematical function, and the modified byte stream is reassembled into a valid PNG output. Seven algorithms are implemented: Caesar (additive shift), Multiplicative, Affine (linear transform), Playfair (16×16 digraph substitution), Hill (matrix multiplication mod 256), RC4 (stream cipher with KSA/PRGA), and Rail Fence (transposition). Decryption is the mathematical inverse of each operation, verified to perfectly reconstruct the original image.
+The image encryption pipeline operates as follows: images are decoded into RGBA pixel buffers, the RGB channels are extracted into a linear byte stream, the byte stream is permuted to break spatial locality, the selected cipher algorithm transforms the permuted bytes, and a final XOR diffusion layer applies a key-derived keystream before the modified bytes are reassembled into a valid PNG output. Seven algorithms are implemented: Caesar (additive shift), Multiplicative, Affine (nonlinear linear-congruential mapping), Playfair (16×16 digraph substitution), Hill (matrix multiplication mod 256), RC4 (stream cipher with KSA/PRGA), and Rail Fence (positional transposition). Decryption reverses the diffusion, algorithm, and permutation stages in the opposite order to perfectly reconstruct the original image.
 <br><br>
 The frontend features animated encryption visualizations, real-time pipeline state indicators, a backend health monitor, drag-and-drop image upload, before/after comparison canvases, and a download facility. All processing is performed by the C++ engine — the browser performs no cryptographic computation.
 </div>
@@ -378,6 +378,8 @@ for (size_t i = 0; i &lt; pixelCount; ++i) {
 
 <p>Some algorithms (Playfair, Hill) operate on pairs or blocks of bytes rather than individual bytes. For these, the stream may be padded with trailing zero bytes to reach a multiple of the block size. This padding is accounted for during decryption by trimming the stream back to its original length before reconstruction.</p>
 
+<p>In the enhanced architecture, the RGB stream is first permuted to separate spatial neighbours, then encrypted by the selected algorithm, and finally diffused with a keystream XOR before reconstruction. This layered structure keeps the pipeline modular while producing more visually distinct ciphertext images.</p>
+
 <h3>3.4 Image Reconstruction and Encoding</h3>
 <p>After encryption, <span class="mono">PixelProcessor::reconstructRGBStream()</span> writes the transformed bytes back into the RGBA pixel buffer, placing each byte at its original R/G/B position while leaving the alpha channel at its original value. <span class="mono">ImageReconstructor::encodePNG()</span> then calls <span class="mono">stbi_write_png_to_func()</span> with a callback that appends bytes to an output vector, which is streamed directly to the HTTP response via <span class="mono">res.set_content_provider()</span>. No temporary files are written to disk at any stage.</p>
 
@@ -421,9 +423,13 @@ for (size_t i = 0; i &lt; pixelCount; ++i) {
       <div class="pipe-arrow">↓</div>
       <div class="pipe-box" style="background:#0f2718;color:#88ddaa;">PixelProcessor::extractRGBStream()</div>
       <div class="pipe-arrow">↓</div>
+      <div class="pipe-box" style="background:#0f2718;color:#88ddaa;">Pixel permutation / shuffling</div>
+      <div class="pipe-arrow">↓</div>
       <div class="pipe-box" style="background:#0f2718;color:#88ddaa;">CipherFactory → Algorithm Engine</div>
       <div class="pipe-arrow">↓</div>
-      <div class="pipe-box" style="background:#0f2718;color:#88ddaa;">cipher.encrypt(rgbStream)</div>
+      <div class="pipe-box" style="background:#0f2718;color:#88ddaa;">cipher.encrypt(permutedStream)</div>
+      <div class="pipe-arrow">↓</div>
+      <div class="pipe-box" style="background:#0f2718;color:#88ddaa;">XOR diffusion with key-derived keystream</div>
       <div class="pipe-arrow">↓</div>
       <div class="pipe-box" style="background:#0f2718;color:#88ddaa;">reconstructRGBStream()</div>
       <div class="pipe-arrow">↓</div>
@@ -432,21 +438,46 @@ for (size_t i = 0; i &lt; pixelCount; ++i) {
   </div>
 </div>
 
-<p>The <span class="mono">EncryptionPipeline</span> and <span class="mono">DecryptionPipeline</span> classes act as thin orchestrators. They receive a pre-constructed cipher object from the factory, call pixel extraction, invoke the cipher, and call reconstruction. This separation means that adding a new algorithm requires only adding a new class implementing <span class="mono">CipherBase</span> and registering it in <span class="mono">CipherFactory</span> — the pipeline code does not change.</p>
+<p>The <span class="mono">EncryptionPipeline</span> and <span class="mono">DecryptionPipeline</span> classes act as thin orchestrators. They receive a pre-constructed cipher object from the factory, call pixel extraction, permute the byte stream, invoke the cipher, apply diffusion, and call reconstruction. This separation means that adding a new algorithm requires only adding a new class implementing <span class="mono">CipherBase</span> and registering it in <span class="mono">CipherFactory</span> — the pipeline code does not change.</p>
 
 <div class="code-block">// EncryptionPipeline::encryptImageToBytes() — actual implementation
 std::vector&lt;unsigned char&gt; EncryptionPipeline::encryptImageToBytes(const Core::ImageData& img) {
     // 1. Extract RGB byte stream (alpha excluded)
     auto rgbStream = Core::PixelProcessor::extractRGBStream(img);
-    // 2. Apply cipher transformation
-    auto encryptedStream = cipher_-&gt;encrypt(rgbStream);
-    // 3. Rebuild image with transformed bytes
+    // 2. Shuffle pixels to break spatial locality before encryption
+    auto permutedStream = Core::PixelProcessor::permuteRGBStream(rgbStream, key_);
+    // 3. Apply algorithm-specific cipher transformation
+    auto encryptedStream = cipher_-&gt;encrypt(permutedStream);
+    // 4. Diffuse ciphertext with a key-derived XOR keystream
+    auto diffusedStream = Core::PixelProcessor::xorDiffuse(encryptedStream, key_);
+    // 5. Rebuild image with transformed bytes
     Core::ImageData output = img;
-    Core::PixelProcessor::reconstructRGBStream(output, encryptedStream);
-    // 4. Encode as PNG and return
+    Core::PixelProcessor::reconstructRGBStream(output, diffusedStream);
+    // 6. Encode as PNG and return
     return Core::ImageReconstructor::encodePNG(output);
 }</div>
 </div>
+
+<h3>4.1 Enhanced Visual Encryption Behavior</h3>
+<p>Earlier encrypted outputs looked similar because the original pipeline transformed the RGB byte stream in place and then wrote the bytes back to the same pixel positions. That preserved the image's spatial layout, so all ciphers still retained comparable edge density, contour structure, and local colour adjacency. In other words, the algorithms changed values more than they changed visual arrangement.</p>
+
+<p>The enhanced design separates the sources of visual change into three layers. First, pixel permutation/shuffling reorders byte positions before encryption so neighbouring pixels no longer remain neighbours. Second, the core cipher applies its own mathematical transform, which differs by algorithm. Third, XOR diffusion adds a key-derived keystream after encryption so any residual structure is flattened without breaking reversibility.</p>
+
+<div class="callout note">
+  <strong>Enhanced visual model.</strong> The final ciphertext image is the composition of spatial permutation, algorithm-specific value transformation, and key-driven diffusion. Decryption reverses the process in the opposite order: remove diffusion, apply the inverse algorithm, and undo the permutation.
+</div>
+
+<div class="math-block">
+  <span class="eq">Encrypt:  S = π(P),  T = A<sub>k</sub>(S),  E = T ⊕ KS(key)</span>
+  <span class="eq">Decrypt:  T = E ⊕ KS(key),  S = A<sub>k</sub><sup>−1</sup>(T),  P = π<sup>−1</sup>(S)</span>
+</div>
+
+<ul>
+  <li><strong>Pixel permutation</strong> disrupts adjacency before encryption, making low-frequency outlines and repeated local textures much harder to preserve.</li>
+  <li><strong>Diffusion</strong> spreads a small byte change across the reconstructed image so that nearby ciphertext values no longer mirror the source image's neighbourhoods.</li>
+  <li><strong>XOR keystream</strong> adds a reversible, key-derived mask that increases entropy while keeping the stream length unchanged.</li>
+  <li><strong>Algorithm-specific visual uniqueness</strong> remains visible because each cipher class reshapes the permuted data differently before diffusion is applied.</li>
+</ul>
 
 <!-- ═══════════════════════════════════════════
      5. ALGORITHM IMPLEMENTATIONS
@@ -825,16 +856,18 @@ for each input byte P[k]:
 <p class="tbl-caption">Table 5 — Algorithm Performance (n = total RGB byte count)</p>
 
 <h3>9.2 Visual Encryption Effectiveness</h3>
+<p>The enhanced pipeline intentionally separates spatial scrambling from byte-wise transformation. As a result, the visual character of the encrypted image now reflects both the cipher family and the shared diffusion layer: substitution ciphers still reshape value distributions differently, block ciphers introduce stronger local mixing, stream ciphers appear noise-like, and transposition ciphers remain recognisably positional.</p>
+
 <table>
-  <thead><tr><th>Algorithm</th><th>Image Structure Visible?</th><th>Colour Shift</th><th>Statistical Randomness</th></tr></thead>
+  <thead><tr><th>Algorithm</th><th>Core Transform</th><th>Encrypted Visual Signature</th><th>Distinctive Behavior After Permutation + Diffusion</th></tr></thead>
   <tbody>
-    <tr><td>Caesar</td><td>Yes — fully visible</td><td>Uniform hue shift</td><td>Low</td></tr>
-    <tr><td>Multiplicative</td><td>Yes — partially</td><td>Non-linear mapping</td><td>Low</td></tr>
-    <tr><td>Affine</td><td>Partially visible</td><td>Linear colour transform</td><td>Moderate</td></tr>
-    <tr><td>Playfair</td><td>No — scrambled</td><td>Complex</td><td>Good</td></tr>
-    <tr><td>Hill</td><td>No — fully scrambled</td><td>Matrix diffusion</td><td>Very good</td></tr>
-    <tr><td>RC4</td><td>No — random noise</td><td>Pseudo-random</td><td>Excellent</td></tr>
-    <tr><td>Rail Fence</td><td>Striped pattern</td><td>None (transposition)</td><td>Low</td></tr>
+    <tr><td>Caesar</td><td>Byte shift</td><td>Soft global tint with no structural recovery</td><td>Nearest-neighbour layout is broken by permutation, but the value mapping remains the simplest and most uniform.</td></tr>
+    <tr><td>Multiplicative</td><td>Byte scaling mod 256</td><td>Contrast-biased remapping with stronger tonal distortion</td><td>Produces a more uneven histogram than Caesar, yet remains value-only and therefore easy to distinguish from block and stream ciphers.</td></tr>
+    <tr><td>Affine</td><td>Linear-congruential mapping</td><td>Nonlinear colour remapping with broader spread</td><td>The additive term prevents the Caesar-like uniform shift and yields a visibly different tonal pattern after diffusion.</td></tr>
+    <tr><td>Playfair</td><td>Digraph substitution</td><td>Paired-byte texture breakup</td><td>Operates on byte pairs, so small repeated patterns are disrupted differently from single-byte substitution ciphers.</td></tr>
+    <tr><td>Hill</td><td>Block matrix transform</td><td>Strong block mixing and local decorrelation</td><td>Cross-byte mixing inside each block produces a more aggressive scrambling effect than Caesar, Affine, or Multiplicative.</td></tr>
+    <tr><td>RC4</td><td>Stream-cipher XOR</td><td>Noise-like output with high apparent entropy</td><td>The keystream randomisation dominates the image, making the result visually closest to pure noise.</td></tr>
+    <tr><td>Rail Fence</td><td>Positional permutation</td><td>Striped displacement and re-ordered contours</td><td>Unlike the others, Rail Fence alters position more than value, so the visual effect remains transposition-heavy even after diffusion.</td></tr>
   </tbody>
 </table>
 <p class="tbl-caption">Table 6 — Visual Encryption Quality Comparison</p>
@@ -890,7 +923,7 @@ for each input byte P[k]:
 
 <p>The modular architecture makes the system extensible: adding a new cipher requires only implementing the four-method <span class="mono">CipherBase</span> interface and registering the new class in <span class="mono">CipherFactory</span>. The image processing pipeline — decode, extract, transform, reconstruct, encode — remains unchanged regardless of which algorithm is selected.</p>
 
-<p>The project provides a practical platform for studying how classical cryptographic algorithms behave when applied to image data, demonstrating the trade-offs between key complexity, visual encryption quality, and cryptographic security within a unified, interactive system.</p>
+<p>The project provides a practical platform for studying how classical cryptographic algorithms behave when applied to image data, demonstrating the trade-offs between key complexity, visual encryption quality, and cryptographic security within a unified, interactive system. The enhanced permutation and diffusion stages make those differences visible without compromising the reversibility of the pipeline.</p>
 
 <!-- ═══════════════════════════════════════════
      12. REFERENCES
